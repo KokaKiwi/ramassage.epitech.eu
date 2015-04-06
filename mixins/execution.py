@@ -14,12 +14,12 @@ class ExecMixin(object):
     def __init__(self):
         pass
 
-    def _safe_exec(self, command, timeout=15):
+    def _safe_exec(self, command, timeout=15, cwd=None):
         if isinstance(command, str):
             command = shlex.split(command)
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         try:
-            outs, errs = proc.communicate(timeout=15)
+            outs, errs = proc.communicate(timeout=timeout)
         except subprocess.TimeoutExpired as e:
             proc.kill()
             outs, errs = proc.communicate()
