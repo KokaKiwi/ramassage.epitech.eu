@@ -58,8 +58,8 @@ class FsMixin(object):
                  num = int(e)
                  root = n
             except ValueError:
-                 root = file_spec
-            _max = 0
+                 root = n
+            _max = -1
             base = os.path.basename(root)
             for file in os.listdir(os.path.dirname(filename)):
                 if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
@@ -72,7 +72,7 @@ class FsMixin(object):
             return '%s.%03d%s' % (root, _max + 1, ext)
         return filename
 
-    """def _new_version(self, filename):
+    def _last_version(self, filename):
         if os.path.isfile(filename):
             file_spec, ext = os.path.splitext(filename)
             n, e = os.path.splitext(file_spec)
@@ -80,14 +80,18 @@ class FsMixin(object):
                  num = int(e)
                  root = n
             except ValueError:
-                 root = file_spec
-            # Find next available file version
-            for i in range(1000):
-                new_file = '%s.%03d' % (root, i)
-                if not os.path.isfile("%s%s" % (new_file, ext)):
-                    return "%s%s" % (new_file, ext)
-        return filename
-    """
-
-    def _last_version(self, filename):
+                 root = n
+            _max = -1
+            base = os.path.basename(root)
+            for file in os.listdir(os.path.dirname(filename)):
+                if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
+                    try:
+                        v = int(file.split(".")[1])
+                        if v > _max:
+                            _max = v
+                    except ValueError:
+                        pass
+            if _max == -1:
+                return filename
+            return '%s.%03d%s' % (root, _max, ext)
         return filename
