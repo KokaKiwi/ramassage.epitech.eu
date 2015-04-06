@@ -46,11 +46,12 @@ class FsMixin(object):
             self._makedirs(path)
         archive_name = os.path.join(path, archive_name)
         if versioned:
-            archive_name = self._new_version("%s.%s" % (archive_name, _format))
+            archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=False)
         return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
 
 
-    def _new_version(self, filename):
+    def _new_version(self, filename, with_extension=True):
+        file_spec, ext = os.path.splitext(filename)
         if os.path.isfile(filename):
             file_spec, ext = os.path.splitext(filename)
             n, e = os.path.splitext(file_spec)
@@ -69,10 +70,10 @@ class FsMixin(object):
                             _max = v
                     except ValueError:
                         pass
-            return '%s.%03d%s' % (root, _max + 1, ext)
-        return filename
+            return '%s.%03d%s' % (root, _max + 1, ext if with_extension else "")
+        return filename if with_extension else file_spec
 
-    def _last_version(self, filename):
+    def _last_version(self, filename, with_extension=True):
         if os.path.isfile(filename):
             file_spec, ext = os.path.splitext(filename)
             n, e = os.path.splitext(file_spec)
