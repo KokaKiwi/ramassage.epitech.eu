@@ -55,3 +55,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+config.local.py
+config.py
+
+.idea/
