@@ -74,6 +74,7 @@ class FsMixin(object):
         return filename if with_extension else file_spec
 
     def _last_version(self, filename, with_extension=True):
+        file_spec, ext = os.path.splitext(filename)
         if os.path.isfile(filename):
             file_spec, ext = os.path.splitext(filename)
             n, e = os.path.splitext(file_spec)
@@ -94,5 +95,5 @@ class FsMixin(object):
                         pass
             if _max == -1:
                 return filename
-            return '%s.%03d%s' % (root, _max, ext)
-        return filename
+            return '%s.%03d%s' % (root, _max, ext if with_extension else "")
+        return filename if with_extension else file_spec
