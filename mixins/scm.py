@@ -29,17 +29,17 @@ class GitRepository(ExecMixin, FsMixin):
             self._status = "Success"
             self._messages += "OK. "
             return True
-        self._messages += "%s. " % (str(res.exception))
+        self._messages += "%s. " % (str(res.exception) if res.exception else res.errs.decode("utf-8"))
         self._status = "Fail"
         return False
 
-    def clone_with_retries(self, count=2):
+    def clone_with_retries(self, count=3):
         for i in range(count):
             self.remove()
             self._messages += "[%s/%s] " % (i, count)
             if self.clone():
                 return True
-            time.slee(0.2)
+            time.sleep(0.2)
         return False
 
     def exists(self):
