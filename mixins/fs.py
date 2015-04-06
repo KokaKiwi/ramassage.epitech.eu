@@ -39,3 +39,55 @@ class FsMixin(object):
                 return False
             raise e
         return True
+
+    def _archive(self, path, archive_name, root_dir, versioned=False, _format="zip"):
+        logging.debug("_archive:: %s.zip < %s" % (archive_name, root_dir))
+        if not path:
+            self._makedirs(path)
+        archive_name = os.path.join(path, archive_name)
+        if versioned:
+            archive_name = self._new_version("%s.%s" % (archive_name, _format))
+        return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
+
+
+    def _new_version(self, filename):
+        if os.path.isfile(filename):
+            file_spec, ext = os.path.splitext(filename)
+            n, e = os.path.splitext(file_spec)
+            try:
+                 num = int(e)
+                 root = n
+            except ValueError:
+                 root = file_spec
+            _max = 0
+            base = os.path.basename(root)
+            for file in os.listdir(os.path.dirname(filename)):
+                if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
+                    try:
+                        v = int(file.split(".")[1])
+                        if v > _max:
+                            _max = v
+                    except ValueError:
+                        pass
+            return '%s.%03d%s' % (root, _max + 1, ext)
+        return filename
+
+    """def _new_version(self, filename):
+        if os.path.isfile(filename):
+            file_spec, ext = os.path.splitext(filename)
+            n, e = os.path.splitext(file_spec)
+            try:
+                 num = int(e)
+                 root = n
+            except ValueError:
+                 root = file_spec
+            # Find next available file version
+            for i in range(1000):
+                new_file = '%s.%03d' % (root, i)
+                if not os.path.isfile("%s%s" % (new_file, ext)):
+                    return "%s%s" % (new_file, ext)
+        return filename
+    """
+
+    def _last_version(self, filename):
+        return filename
