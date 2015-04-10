@@ -105,6 +105,6 @@ class GitMixin(FsMixin):
         local_uri = os.path.join(config.REPOS_DIR, "%(task_id)s/%(repos)s/%(stud)s" % {"task_id": task_id, "repos": repository_name, "stud": student})
         return self._remove_repository_(local_uri)
 
-    def remove_all_repository(self, task_id, repository_name):
+    def _remove_all_repository(self, task_id, repository_name):
         local_uri = os.path.join(config.REPOS_DIR, "%(task_id)s/%(repos)s" % {"task_id": task_id, "repos": repository_name})
         return self._rmtree(local_uri, safe=True)

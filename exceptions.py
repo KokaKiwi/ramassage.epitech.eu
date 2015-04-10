@@ -8,3 +8,10 @@ class NotImplemented(Exception):
     def __str__(self):
         return self.msg
 
+
+class UnknownActivity(Exception):
+    def __init__(self, msg='This activity doesn\'t exist'):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
