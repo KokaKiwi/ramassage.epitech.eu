@@ -68,6 +68,12 @@ class CrawlerMixin(object):
                 ret.append(elem["login"])
             return ret
 
+        _conversion = {"0": 5, "1": 5, "2": 5,
+                       "3": 4, "4": 4,
+                       "5": 3, "6": 3,
+                       "7": 2, "8": 2,
+                       "9": 1, "10": 1}
+
         base = self._get("/", token)
         if not base:
             raise UnknownActivity()
@@ -84,6 +90,7 @@ class CrawlerMixin(object):
                     for member in group["members"]:
                         g.append(member["login"])
                 clean_groups.append(g)
+
         result = {
             "scolaryear": base["scolaryear"],
             "codemodule": base["codemodule"],
@@ -96,6 +103,7 @@ class CrawlerMixin(object):
             "assistants": _get_logins(profs, "assistant"),
             "users": users,
             "groups": clean_groups,
+            "promo": int(base["scolaryear"]) + _conversion[base["codeinstance"].split("-")[1]]
             }
         if "codeinstance" in base:
             result["codeinstance"] = base["codeinstance"]
