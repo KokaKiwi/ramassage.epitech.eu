@@ -5,6 +5,7 @@ from exceptions import NotImplemented, UnknownActivity
 import config
 import logging
 import hashlib
+import os
 
 
 class CrawlerMixin(object):
@@ -18,9 +19,9 @@ class CrawlerMixin(object):
                 cleaned += line
         return json.loads(cleaned)
 
-    def _raw_get(self, url, params=None, content_type="application/json", safe=False):
+    def _raw_get(self, url, params=None, content_type="application/json", safe=False, verify=True):
         try:
-            obj = requests.get(url, params=params)
+            obj = requests.get(url, params=params, verify=verify)
             if content_type == "application/json":
                 return obj.status_code, obj.json()
             elif content_type == "application/bigintjson":
@@ -32,10 +33,10 @@ class CrawlerMixin(object):
             raise e
 
     def _raw_post(self, url, datas=None, content_type="application/x-www-form-urlencoded",
-                  response_type="application/json", headers={}, safe=False):
+                  response_type="application/json", headers={}, safe=False, verify=True):
         try:
             headers['content-type'] = content_type
-            obj = requests.post(url, data=datas, headers=headers)
+            obj = requests.post(url, data=datas, headers=headers, verify=verify)
             if response_type == "application/json":
                 return obj.status_code, obj.json()
             elif response_type == "application/bigintjson":
@@ -58,6 +59,33 @@ class CrawlerMixin(object):
 
     def _post(self):
         raise NotImplemented()
+
+    def _inform(self, url, task, optional=None):
+        datas = {
+            "project_name": task["real_name"] if "real_name" in task else task["slug"],
+            "project_code": task["slug"],
+            "semester": "B%s" % (task["codeinstance"].split('-')[1] if "codeinstance" in task and len(task["codeinstance"].split("-")) > 0 else 0),
+            "module_name": task["module_title"] if "module_title" in task else task["codemodule"],
+            "module_code": task["codemodule"],
+            "promotion": task["promo"] if "promo" in task else "2013",
+            "project_end_date": task["deadline"] if task["deadline"] and len(task["deadline"]) != 0
+                                                    and not task["deadline"].startswith("0000") else task["end"],
+            }
+        status, content = self._raw_post(url, datas, content_type="application/json", verify=False, safe=True)
+        if self.status != 200:
+            logging.warning("CrawlerMixin::_inform: url(%s) status(%s) reason(%s)" % (url, status, content))
+            return False
+        return True
+
+    def inform_triche(self, task):
+        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % {task}}
+        return self._inform(config.TRICHE_URL, task, opt)
+
+    def inform_callback(self, task, url):
+        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % {task},
+               "correction_path": config.CORRECTION_DIR_IN_JAIL % {task}}
+        return self._inform(url, task, opt)
+
 
     def _crawl_activity(self, token):
         def _get_logins(obj, key):

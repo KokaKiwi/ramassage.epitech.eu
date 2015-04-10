@@ -1,7 +1,7 @@
 __author__ = 'steven'
 
 import os, errno, shutil, stat, logging
-
+import config
 
 class FsMixin(object):
     def __init__(self):
@@ -97,3 +97,40 @@ class FsMixin(object):
                 return filename
             return '%s.%03d%s' % (root, _max, ext if with_extension else "")
         return filename if with_extension else file_spec
+
+    def _distribute_for_user(self, datas, filepath, filename):
+        path = config.DISTRIBUTE_DIR % datas
+        if not os.path.exists(path):
+            self._makedirs(path, safe=True)
+        if os.path.exists(os.path.join(path, filename)):
+            os.remove(os.path.join(path, filename))
+        os.link(os.path.join(filepath, filename), os.path.join(path, filename))
+
+    def _distribute(self, users, filename, scolaryear, codemodule, slug, filepath=config.ARCHIVE_DIR):
+        datas = {
+            "scolaryear": scolaryear,
+            "codemodule": codemodule,
+            "slug": slug,
+        }
+        for user in users:
+            datas["login"] = user
+            self._distribute_for_user(datas, filepath, filename)
+
+    def distribute(self, task, filename, filepath=config.ARCHIVE_DIR):
+        if "resp" in task and not isinstance(task["resp"], list):
+            task["resp"] = [task["resp"]]
+        if "template_resp" in task and not isinstance(task["template_resp"], list):
+            task["template_resp"] = [task["template_resp"]]
+        if "assistants" in task and not isinstance(task["assistants"], list):
+                task["assistants"] = [task["assistants"]]
+        if "triche" in task and task["triche"]:
+            if "template_resp" in task:
+                task["template_resp"].append(config.TRICHE_LOGIN)
+            else:
+                task["template_resp"] = [config.TRICHE_LOGIN]
+        if "resp" in task:
+            self._distribute(task["resp"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
+        if "template_resp" in task:
+            self._distribute(task["template_resp"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
+        if "assistants" in task:
+            self._distribute(task["assistants"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
