@@ -4,6 +4,7 @@ __author__ = 'steven'
 from sqlalchemy import Column, String, Integer, ForeignKey, UniqueConstraint, Boolean, Enum, DateTime, Text, Table
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+from .config import SQL_URI, SQL_DB_URI
 import sys
 Base = declarative_base()
 
@@ -58,7 +59,6 @@ class Project_Student(Base):
     __tablename__ = 'project_student_user'
     project_id = Column(Integer, ForeignKey('project.id'), primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), primary_key=True)
-    #extra_data = Column(String(50))
     status = Column(Enum("Succeed", "Failed", "WithErrors"), nullable=True)
     logs = Column(Text, nullable=True)
     begin_date = Column(DateTime, nullable=True)
@@ -103,14 +103,14 @@ class Task(Base):
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
-    engine = create_engine('mysql+mysqldb://root:toto4242@localhost:3306/ramassage', echo=True)
+    engine = create_engine(SQL_DB_URI, echo=True)
     from sqlalchemy.orm import sessionmaker
     Session = sessionmaker()
     Session.configure(bind=engine)
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "init":
-            en = create_engine('mysql+mysqldb://root:toto4242@localhost:3306/', echo=True)
+            en = create_engine(SQL_URI, echo=True)
             conn = en.connect()
             conn.execute("commit")
             conn.execute('drop database if exists ramassage')
