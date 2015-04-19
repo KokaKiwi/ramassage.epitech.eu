@@ -6,6 +6,12 @@ class JudgeMixin(object):
     def __init__(self):
         pass
 
+
+    def _generate_logins_file(self, logins):
+        pass
+
+
+
     # machine name
     # rule
     # command line
