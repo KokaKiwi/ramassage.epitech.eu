@@ -11,6 +11,11 @@ import datetime,json
 
 Base = declarative_base()
 
+def dump_datetime(value):
+    """Deserialize datetime object into string form for JSON processing."""
+    if value is None:
+        return None
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
 class User(Base):
     __tablename__ = 'user'
@@ -24,6 +29,9 @@ class User(Base):
                                                                                    self.firstname,
                                                                                    self.lastname,
                                                                                    self.login)
+    @property
+    def serialize(self):
+        return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname, "login": self.login}
 
 class Template(Base):
     __tablename__ = 'template'

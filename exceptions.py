@@ -15,3 +15,11 @@ class UnknownActivity(Exception):
 
     def __str__(self):
         return self.msg
+
+
+class FieldsMissing(Exception):
+    def __init__(self, msg='Fields are missing'):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg
