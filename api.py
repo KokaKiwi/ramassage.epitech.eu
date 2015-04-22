@@ -47,6 +47,30 @@ def api_post_user():
         return api_return_error(500, "Server error", str(e))
     return jsonify(u.serialize), 201
 
+@app.route('/1.0/user/<int:_id>', methods=["GET"])
+def api_get_user(_id):
+    try:
+        u = db.session.query(User).get(_id)
+        if not u:
+            return api_return_error(404, "User #%s not found" % _id)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify(u.serialize), 200
+
+@app.route('/1.0/user/<string:login>', methods=["GET"])
+def api_get_user_login(login):
+    try:
+        u = db.session.query(User).filter_by(login=login).first()
+        if not u:
+            return api_return_error(404, "User %s not found" % login)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify(u.serialize), 200
+
 
 @app.route('/1.0/user/<int:id>', methods=["PUT"])
 def api_put_user(id):
