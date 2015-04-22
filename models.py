@@ -6,8 +6,11 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 from config import SQL_URI, SQL_DB_URI
 import sys
+import datetime,json
+
+
 Base = declarative_base()
-import datetime, json
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -63,7 +66,6 @@ class Project_Student(Base):
     logs = Column(Text, nullable=True)
     begin_date = Column(DateTime, nullable=True)
     end_date = Column(DateTime, nullable=True)
-    #students = relationship("User", backref("project_assocs"))
     user = relationship("User")
     #project = relationship("Project")
 
@@ -102,6 +104,7 @@ class Task(Base):
     launch_date = Column(DateTime, nullable=False)
     status = Column(Enum("ongoing", "todo", "succeed", "failed"), default="todo")
     project_id = Column(Integer, ForeignKey("project.id"))
+    extend = Column(Text, nullable=True) # json packed extended properties
 
 
 if __name__ == "__main__":
