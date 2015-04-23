@@ -207,6 +207,20 @@ class Task(Base):
             "extend": json.loads(self.extend) if self.extend else None
         }
 
+"""
+>>> import models
+>>> from models import Task
+>>> from config import SQL_DB_URI
+>>> from sqlalchemy import create_engine
+>>> engine = create_engine(SQL_DB_URI, echo=True)
+>>> from sqlalchemy.orm import sessionmaker
+>>> Session = sessionmaker()
+>>> Session.configure(bind=engine)
+>>> session = Session()
+>>> session.query(Task).get(1)
+"""
+
+
 if __name__ == "__main__":
     from sqlalchemy import create_engine
     engine = create_engine(SQL_DB_URI, echo=True)
