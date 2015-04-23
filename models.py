@@ -47,8 +47,29 @@ class Template(Base):
     judge_final_exec = Column(String(200), nullable=True)
     school = Column(Enum("epitech", "coding-academy", "webacademy", "samsung"), default="epitech")
     projects = relationship("Project", backref="template")
-    __table_args__ = (UniqueConstraint('codemodule', 'slug', name='_codemodule_slug_uc'),
-                     )
+    __table_args__ = (UniqueConstraint('codemodule', 'slug', name='_codemodule_slug_uc'),)
+
+    def __repr__(self):
+        return "<Template id='%s', codemodule='%s', slug='%s', repository_name='%s', call_moulitriche='%s', \
+        call_judge='%s', judge_uri='%s', judge_rule='%s', judge_preliminary_exec='%s', judge_final_exec='%s', \
+        school='%s'>" % (self.id, self.codemodule, self.slug, self.repository_name, self.call_moulitriche,
+                         self.call_judge, self.judge_uri, self.judge_rule, self.judge_preliminary_exec,
+                         self.judge_final_exec, self.school)
+    @property
+    def serialize(self):
+        return {
+            "id": self.id,
+            "codemodule": self.codemodule,
+            "slug": self.slug,
+            "repository_name": self.repository_name,
+            "call_moulitriche": self.call_moulitriche,
+            "call_judge": self.call_judge,
+            "judge_uri": self.judge_uri,
+            "judge_rule": self.judge_rule,
+            "judge_preliminary_exec": self.judge_preliminary_exec,
+            "judge_final_exec": self.judge_final_exec,
+            "school": self.school
+        }
 
 project_assistant_user_table = Table('project_assistant_user', Base.metadata,
     Column('project_id', Integer, ForeignKey('project.id')),
@@ -112,6 +133,7 @@ class Task(Base):
     launch_date = Column(DateTime, nullable=False)
     status = Column(Enum("ongoing", "todo", "succeed", "failed"), default="todo")
     project_id = Column(Integer, ForeignKey("project.id"))
+    exec_cmd = Column(String(200), nullable=True) # override default exec_command
     extend = Column(Text, nullable=True) # json packed extended properties
 
 
