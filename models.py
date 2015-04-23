@@ -11,11 +11,12 @@ import datetime,json
 
 Base = declarative_base()
 
-def dump_datetime(value):
+
+def dump_datetime(value, split=True):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if split else value.strftime("%Y-%m-%d %H:%M:%S")
 
 class User(Base):
     __tablename__ = 'user'
@@ -96,7 +97,23 @@ class Project_Student(Base):
     begin_date = Column(DateTime, nullable=True)
     end_date = Column(DateTime, nullable=True)
     user = relationship("User")
-    #project = relationship("Project")
+
+    def __repr__(self):
+        return "<Project_Student project_id='%s', user_id='%s', user='%s', status='%s', logs='%s', begin_date='%s', \
+        end_date='%s'>" % (self.project_id, self.user_id, self.user.serialize, self.status, self.logs,
+                           dump_datetime(self.begin_date, split=False), dump_datetime(self.end_date, split=False))
+
+    @property
+    def serialize(self):
+        return {
+            "project_id": self.project_id,
+            "user_id": self.user_id,
+            "user": self.user.serialize,
+            "status": self.status,
+            "logs": self.logs,
+            "begin_date": dump_datetime(self.begin_date, split=False),
+            "end_date": dump_datetime(self.begin_date, split=False)
+        }
 
 class Project(Base):
     __tablename__ = 'project'
@@ -126,6 +143,42 @@ class Project(Base):
     last_action = Column(DateTime, nullable=True)
     tasks = relationship("Task", backref=backref("project"))
 
+    def __repr__(self):
+        return "<Project id='%s', token='%s', template_id='%s', template='%s', scolaryear='%s', " \
+               "module_title='%s', module_code='%s', instance_code='%s', location='%s', title='%s', " \
+               "deadline='%s', promo='%s', groups='%s', students='%s', resp='%s', template_resp='%s', assistants='%s', " \
+               "last_update='%s', last_action='%s'>" % (self.id, self.token, self.template_id, self.template.serialize,
+                                                        self.scolaryear, self.module_title, self.module_code,
+                                                        self.instance_code, self.location, self.title,
+                                                        dump_datetime(self.deadline, split=False), self.promo,
+                                                        self.groups, self.students, self.resp, self.template_resp,
+                                                        self.assistants, dump_datetime(self.last_update, split=False),
+                                                        dump_datetime(self.last_action, split=False))
+
+    @property
+    def serialize(self):
+        return {
+            "id": self.id,
+            "token": self.token,
+            "template_id": self.template_id,
+            "template": self.template.serialize,
+            "scolaryear": self.scolaryear,
+            "module_title": self.module_title,
+            "module_code": self.module_code,
+            "instance_code": self.instance_code,
+            "location": self.location,
+            "title": self.title,
+            "deadline": dump_datetime(self.deadline, split=False),
+            "promo": self.promo,
+            "groups": json.loads(self.groups) if self.groups else None,
+            "students": [s.serialize for s in self.students],
+            "resp": [u.serialize for u in self.resp],
+            "template_resp": [u.serialize for u in self.template_resp],
+            "assistants": [u.serialize for u in self.assistants],
+            "last_update": dump_datetime(self.last_update, split=False),
+            "last_action": dump_datetime(self.last_action, split=False)
+        }
+
 class Task(Base):
     __tablename__ = 'task'
     id = Column(Integer, primary_key=True)
@@ -136,6 +189,23 @@ class Task(Base):
     exec_cmd = Column(String(200), nullable=True) # override default exec_command
     extend = Column(Text, nullable=True) # json packed extended properties
 
+    def __repr__(self):
+        return "<Task id='%s', type='%s', launch_date='%s', status='%s', project_id='%s', project='%s', exec_cmd='%s', " \
+               "extend='%s'>" % (self.id, self.type, dump_datetime(self.launch_date, split=False), self.status,
+                                 self.project_id, self.project, self.exec_cmd, self.extend)
+
+    @property
+    def serialize(self):
+        return {
+            "id": self.id,
+            "type": self.type,
+            "launch_date": dump_datetime(self.launch_date, split=False),
+            "status": self.status,
+            "project_id": self.project_id,
+            "project": self.project.serialize,
+            "exec_cmd": self.exec_cmd,
+            "extend": json.loads(self.extend) if self.extend else None
+        }
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
