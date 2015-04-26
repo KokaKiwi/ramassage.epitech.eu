@@ -1,0 +1,47 @@
+{
+	"token": "77f6f6ea-be99-d8d6-f322-089ba09fbd2f",
+	"students": [
+			{"login": "adrian_e", "firstname":"Emmanuel", "lastname":"ADRIAN"}, 
+			{"login": "bertra_v", "firstname":"Florent", "lastname":"BERTRAND"}, 
+			{"login": "comman_a", "firstname":"Antoine", "lastname":"COMMANDINI"}, 
+			{"login": "huin-s_d", "firstname":"Dimitri", "lastname":"HUINS-SESNI"}, 
+			{"login": "weisli_r", "firstname":"Rémi", "lastname":"WEISLINGER"}, 
+			{"login": "nurenb_c", "firstname":"Corentin", "lastname":"NURENBERG"}, 
+			{"login": "hidou_l", "firstname":"Loic", "lastname":"HIDOU"}, 
+			{"login": "faleti_a", "firstname":"Adrien", "lastname":"FALETIC"}, 
+			{"login": "mart_-", "firstname":"Pierre-Jean", "lastname":"MARTIN"}, 
+			{"login": "gassma_m", "firstname":"Matthieu", "lastname":"GASSMAN"}, 
+			{"login": "cichy_r", "firstname":"Rémi", "lastname":"CICHY"}
+	], 
+
+	"resp": [
+			{"login": "leger_i", "firstname":"Pierre-Jean", "lastname":"LEGER"}, 
+			{"login": "medega_j", "firstname":"Jérôme", "lastname":"MEDEGAN"}, 
+			{"login": "mart_s", "firstname":"Steven1", "lastname":"MARTINS"}
+	], 
+	"scolaryear": "2014", 
+	"template_resp": [
+			{"login": "leger_i", "firstname":"Pierre-Jean", "lastname":"LEGER"}, 
+			{"login": "aymeric", "firstname":"Aymeric", "lastname":"FOUCHAULT"}, 
+			{"login": "leger_i", "firstname":"Pierre-Jean", "lastname":"LEGER"}, 
+			{"login": "medega_j", "firstname":"Jérôme", "lastname":"MEDEGAN"}, 
+			{"login": "mart_s", "firstname":"Steven1", "lastname":"MARTINS"}, 
+			{"login": "mortre_x", "firstname":"Xavier", "lastname":"MORTREUX"}
+	], 
+	"deadline": "2015-05-24 23:42:00", 
+	"slug": "42sh", 
+	"module_title": "B2 - Unix System programming", 
+	"end": "2015-05-24 23:42:00", 
+	"location": "FR/NCY", 
+	"title": "42Sh", 
+	"module_code": "B-PSU-155",
+	"promo": 2019,
+	"groups": [],
+	"assistants": [
+			{"login": "galleg_a", "firstname":"Ange", "lastname":"GALLEGO"}, 
+			{"login": "hennuy_w", "firstname":"Wilfried", "lastname":"HENNUYER"}, 
+			{"login": "janecz_n", "firstname":"Nathan", "lastname":"JANEZCO"}, 
+			{"login": "ramage_v", "firstname":"Victorien", "lastname":"RAMAGET"}
+	], 
+	"instance_code": "NCY-2-1"
+}

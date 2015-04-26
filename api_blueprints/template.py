@@ -48,7 +48,7 @@ def api_get_template(_id):
     try:
         u = db.session.query(Template).get(_id)
         if not u:
-            return api_return_error(404, "User #%s not found" % _id)
+            return api_return_error(404, "Template #%s not found" % _id)
     except Exception as e:
         db.session.rollback()
         logging.error(str(e))

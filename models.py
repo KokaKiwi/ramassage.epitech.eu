@@ -129,7 +129,8 @@ class Project(Base):
     deadline = Column(DateTime, nullable=False)
     promo = Column(Integer, nullable=True)
     groups = Column(Text, nullable=True) # json packed groups
-    students = relationship("Project_Student", backref=backref("project"))
+    students = relationship("Project_Student", backref=backref("project"),
+                            cascade="save-update, merge, delete, delete-orphan")
     resp = relationship("User",
                     secondary=project_resp_user_table,
                     backref="projects_as_resp")
@@ -176,7 +177,8 @@ class Project(Base):
             "template_resp": [u.serialize for u in self.template_resp],
             "assistants": [u.serialize for u in self.assistants],
             "last_update": dump_datetime(self.last_update, split=False),
-            "last_action": dump_datetime(self.last_action, split=False)
+            "last_action": dump_datetime(self.last_action, split=False),
+            "tasks": [t.serialize_lazy for t in self.tasks]
         }
 
 class Task(Base):
@@ -196,16 +198,25 @@ class Task(Base):
 
     @property
     def serialize(self):
-        return {
+        return self._serialize(with_project=True)
+
+    @property
+    def serialize_lazy(self):
+        return self._serialize(with_project=False)
+
+    def _serialize(self, with_project):
+        o = {
             "id": self.id,
             "type": self.type,
             "launch_date": dump_datetime(self.launch_date, split=False),
             "status": self.status,
             "project_id": self.project_id,
-            "project": self.project.serialize,
             "exec_cmd": self.exec_cmd,
             "extend": json.loads(self.extend) if self.extend else None
         }
+        if with_project:
+            o["project"] = self.project.serialize,
+        return o
 
 """
 >>> import models
