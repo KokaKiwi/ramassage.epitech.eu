@@ -134,6 +134,7 @@ def api_get_project_slug(slug):
         return api_return_error(500, "Server error", str(e))
     return jsonify({"projects": [p.serialize for p in projects]}), 200
 
+
 @project.route('/<int:_id>', methods=["PUT"])
 def api_put_project(_id):
     from api import db, api_return_error
@@ -202,6 +203,7 @@ def api_put_project(_id):
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
     return jsonify(t.serialize), 200
+
 
 @project.route('/<int:_id>', methods=["PATCH"])
 def api_patch_project(_id):

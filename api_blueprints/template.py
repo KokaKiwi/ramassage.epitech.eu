@@ -42,6 +42,7 @@ def api_post_template():
         return api_return_error(500, "Server error", str(e))
     return jsonify(t.serialize), 201
 
+
 @template.route('/<int:_id>', methods=["GET"])
 def api_get_template(_id):
     from api import db, api_return_error
@@ -55,6 +56,7 @@ def api_get_template(_id):
         return api_return_error(500, "Server error", str(e))
     return jsonify(u.serialize), 200
 
+
 @template.route('/<string:slug>', methods=["GET"])
 def api_get_template_slug(slug):
     from api import db, api_return_error
@@ -67,6 +69,7 @@ def api_get_template_slug(slug):
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
     return jsonify({"templates": [t.serialize for t in tpls]}), 200
+
 
 @template.route('/<int:_id>', methods=["PUT", "PATCH"])
 def api_put_template(_id):
