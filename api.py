@@ -20,10 +20,12 @@ db = SQLAlchemy(app)
 from api_blueprints.template import template
 from api_blueprints.user import user
 from api_blueprints.project import project
+from api_blueprints.task import task
 
 app.register_blueprint(template, url_prefix='/1.0/template')
 app.register_blueprint(user, url_prefix='/1.0/user')
 app.register_blueprint(project, url_prefix='/1.0/project')
+app.register_blueprint(task, url_prefix='/1.0/task')
 
 @app.route('/', methods=["GET"])
 def api_get_root():
