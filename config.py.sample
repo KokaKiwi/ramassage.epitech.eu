@@ -1,3 +1,47 @@
 __author__ = 'steven'
 
 
+import os
+
+WORKING_DIR = "/tmp"
+ARCHIVE_DIR = os.path.join(WORKING_DIR, "archives")
+
+DEBUG = True
+
+# git
+REPOS_DIR = os.path.join(WORKING_DIR, "repos")
+REPOS_URI = "git@git.epitech.eu:/%(stud)s/%(repos)s"
+GIT_CLONE_TIMEOUT = 45 # seconds
+GIT_MAX_DEPTH = 5
+
+# url
+CRAWLER_URL = "https://intra.epitech.eu/epicron/%(token)s%(action)s?format=json&sign=%(sign)s"
+CRAWLER_SALT = "??"
+
+# distribute
+
+DISTRIBUTE_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)/%(slug)s")
+CORRECTION_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)/%(slug)s/correction/last")
+DISTRIBUTE_DIR = os.path.join(WORKING_DIR, "jail", DISTRIBUTE_DIR_IN_JAIL)
+CORRECTION_DIR = os.path.join(WORKING_DIR, "jail", CORRECTION_DIR_IN_JAIL)
+TRICHE_LOGIN = "moulinette"
+TRICHE_URL = "https://moulitriche.epitech.eu/webservice"
+
+
+SQL_URI = 'mysql+mysqldb://user:password@localhost:3306/?charset=utf8'
+SQL_DB_URI = 'mysql+mysqldb://user:password@localhost:3306/db?charset=utf8'
+
+
+SMTP_SERVER = "smtp.office365.com"
+SMTP_PORT = 587
+SMTP_SSL = True
+SMTP_LOGIN = "my_login@epitech.eu"
+SMTP_PASSWORD = "password"
+SMTP_FROM = "my_login@epitech.eu"
+
+INTRA_RIVER_SALT = "????"
+#hashlib.sha256(os.urandom(40)).hexdigest()
+API_SALT = {
+    "base": "???",
+    "uuid4": "??",
+}
