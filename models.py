@@ -241,12 +241,12 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "init":
-            en = create_engine(SQL_URI, echo=True)
-            conn = en.connect()
-            conn.execute("commit")
-            conn.execute('drop database if exists ramassage')
-            conn.execute("create database ramassage")
-            conn.close()
+            #en = create_engine(SQL_URI, echo=True)
+            #conn = en.connect()
+            #conn.execute("commit")
+            #conn.execute('drop database if exists ramassage')
+            #conn.execute("create database ramassage")
+            #conn.close()
 
             Base.metadata.create_all(engine)
             sys.exit(0)
