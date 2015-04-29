@@ -1,5 +1,15 @@
 ```
-apt-get install python3 supervisor git mysql-server-5.5 mysql-client-5.5 python3-pip
+# apt-get install python3 supervisor git mysql-server-5.5 mysql-client-5.5 python3-pip libmysqlclient-dev python3-dev build-essential
+# apt-get install libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.1-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libcurl4-openssl-dev
+$ cd /tmp
+$ wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
+$ tar -zxf Python-3.4.3.tgz
+$ cd Python-3.4.3
+$ ./configure --prefix=/usr/local/python-3.4.3
+$ make -j8
+# make install
+# cd /tmp
+# rm -rf Python-3.4.3
 adduser ramassage
 ```
 
@@ -9,13 +19,17 @@ adduser ramassage
 $ git clone git@github.com:steven-martins/ramassage.epitech.eu.git
 $ cd ramassage.epitech.eu
 $ cp config.py.sample config.py
-$ mysql -u root -p
-> CREATE DATABASE 'ramassage';
+$ mysql --defaults-file=/etc/mysql/debian.cnf
+> CREATE DATABASE ramassage;
 > GRANT ALL PRIVILEGES ON ramassage.* To 'an_user'@'localhost' IDENTIFIED BY 'a_password';
 > FLUSH PRIVILEGES;
+$ python3 models.py init
 ```
 
 ```
+# cd /home/ramassage/ramassage.epitech.eu/
+# pip-3.2 install -r requirements.txt
+# pip install -U celery[redis]
 # cp /home/ramassage/ramassage.epitech.eu/docs/supervisor/* /etc/supervisor/conf.d/
 # supervisorctl reread
 # supervisorctl update

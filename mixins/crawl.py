@@ -93,7 +93,8 @@ class CrawlerMixin(object):
             if not obj or len(obj) == 0:
                 return ret
             for elem in obj[key]:
-                ret.append(elem["login"])
+                ret.append({"login": elem["login"], "firstname": elem["title"].split(" ")[0],
+                            "lastname": elem["title"].split(" ")[1], "title": elem["title"]})
             return ret
 
         _conversion = {"0": 5, "1": 5, "2": 5,
@@ -112,33 +113,40 @@ class CrawlerMixin(object):
         for group in groups:
             if not group["master"]["login"] in users:
                 g = []
-                users.append(group["master"]["login"])
-                g.append(group["master"]["login"])
+                m = {"login": group["master"]["login"], "firstname": group["master"]["title"].split(" ")[0],
+                          "lastname": group["master"]["title"].split(" ")[1], "title": group["master"]["title"]}
+                users.append(m)
+                g.append(m)
                 if "members" in group:
                     for member in group["members"]:
-                        g.append(member["login"])
+                        g.append({"login": member["login"], "firstname": member["title"].split(" ")[0],
+                                  "lastname": member["title"].split(" ")[1], "title": member["title"]})
                 clean_groups.append(g)
 
         result = {
+            "token": token,
             "scolaryear": base["scolaryear"],
             "codemodule": base["codemodule"],
+            "module_code": base["codemodule"],
             "instance_location": base["instance_location"],
-            "end": base["end"],
-            "deadline": base["deadline"],
+            "location": base["instance_location"],
+            "deadline": base["deadline"] if base["deadline"] != None and len(base["deadline"]) != 0
+                                            and base["deadline"].startswith("0000") == False else base["end"],
             "slug": base["slug"],
             "resp": _get_logins(profs, "resp"),
             "template_resp": _get_logins(profs, "template_resp"),
             "assistants": _get_logins(profs, "assistant"),
-            "users": users,
+            "students": users,
             "groups": clean_groups,
             "promo": int(base["scolaryear"]) + _conversion[base["codeinstance"].split("-")[1]]
             }
         if "codeinstance" in base:
             result["codeinstance"] = base["codeinstance"]
+            result["instance_code"] = base["codeinstance"]
         if "module_title" in base:
             result["module_title"] = base["module_title"]
         if "title" in base:
-            result["real_name"] = base["title"]
+            result["title"] = base["title"]
         return result
 
 

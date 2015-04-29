@@ -86,6 +86,6 @@ class Client(object):
         print(res.text)
 
 if __name__ == "__main__":
-    g = Client("127.0.0.1:5000")
-    print(str(g.get("/1.0/project/2")))
+    g = Client(config.URI)
+    print(str(g.get("/1.0/project/")))
     #print(str(g.post("/1.0/user/", {"login": "couval_j", "firstname": "Jean-Baptiste", "lastname": "COUVAL"})))
