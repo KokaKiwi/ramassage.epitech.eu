@@ -7,13 +7,12 @@ import logging
 
 user = Blueprint('user', __name__)
 
-from api import db, api_return_error
-
 from api_tools import signed_auth
 
 @user.route('/', methods=["GET"])
 @signed_auth()
 def api_get_users():
+    from api import db, api_return_error
     try:
         users = db.session.query(User).all()
     except Exception as e:
@@ -23,6 +22,7 @@ def api_get_users():
 @user.route('/', methods=["POST"])
 @signed_auth()
 def api_post_user():
+    from api import db, api_return_error
     try:
         datas = request.json
         u = User(firstname=datas["firstname"], lastname=datas["lastname"], login=datas["login"])
@@ -42,6 +42,7 @@ def api_post_user():
 @user.route('/<int:_id>', methods=["GET"])
 @signed_auth()
 def api_get_user(_id):
+    from api import db, api_return_error
     try:
         u = db.session.query(User).get(_id)
         if not u:
@@ -55,6 +56,7 @@ def api_get_user(_id):
 @user.route('/<string:login>', methods=["GET"])
 @signed_auth()
 def api_get_user_login(login):
+    from api import db, api_return_error
     try:
         u = db.session.query(User).filter_by(login=login).first()
         if not u:
@@ -68,6 +70,7 @@ def api_get_user_login(login):
 @user.route('/<int:id>', methods=["PUT"])
 @signed_auth()
 def api_put_user(id):
+    from api import db, api_return_error
     try:
         datas = request.json
         u = db.session.query(User).get(id)
@@ -92,6 +95,7 @@ def api_put_user(id):
 @user.route('/<int:id>', methods=["PATCH"])
 @signed_auth()
 def api_patch_user(id):
+    from api import db, api_return_error
     try:
         datas = request.json
         u = db.session.query(User).get(id)
@@ -115,6 +119,7 @@ def api_patch_user(id):
 @user.route('/<int:id>', methods=["DELETE"])
 @signed_auth()
 def api_delete_user(id):
+    from api import db, api_return_error
     try:
         datas = request.json
         u = db.session.query(User).get(id)
