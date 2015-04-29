@@ -86,6 +86,10 @@ class Client(object):
         print(res.text)
 
 if __name__ == "__main__":
+    import sys
+    if len(sys.argv) == 1:
+        print("USAGE python3 %s /1.0/..." % (sys.argv[0]))
+        sys.exit(1)
     g = Client(config.URI)
-    print(str(g.get("/1.0/project/")))
+    print(str(g.get(sys.argv[1])))
     #print(str(g.post("/1.0/user/", {"login": "couval_j", "firstname": "Jean-Baptiste", "lastname": "COUVAL"})))
