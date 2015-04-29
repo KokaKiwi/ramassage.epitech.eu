@@ -1,0 +1,33 @@
+```
+apt-get install python3 supervisor git mysql-server-5.5 mysql-client-5.5 python3-pip
+adduser ramassage
+```
+
+
+
+```
+$ git clone git@github.com:steven-martins/ramassage.epitech.eu.git
+$ cd ramassage.epitech.eu
+$ cp config.py.sample config.py
+$ mysql -u root -p
+> CREATE DATABASE 'ramassage';
+> GRANT ALL PRIVILEGES ON ramassage.* To 'an_user'@'localhost' IDENTIFIED BY 'a_password';
+> FLUSH PRIVILEGES;
+```
+
+```
+# cp /home/ramassage/ramassage.epitech.eu/docs/supervisor/* /etc/supervisor/conf.d/
+# supervisorctl reread
+# supervisorctl update
+# supervisorctl start ramassage_api
+```
+
+
+Retrieve ramassage-tek private key
+
+.ssh/config
+```
+[git.epitech.eu]
+	IdentityFile .ssh/id_rsa_ramassage
+```
+
