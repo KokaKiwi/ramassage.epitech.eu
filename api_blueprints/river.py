@@ -6,13 +6,15 @@ from models import Project, Project_Student, Template, Task
 import logging
 import json
 from datetime import datetime
+from api_tools import intranet_auth
 
 river = Blueprint('river', __name__)
 
 
-@river.route('/', methods=["POST"])
-def api_post_river():
-    pass
+@river.route('/', methods=["GET"])
+@intranet_auth()
+def api_get_river():
+    return jsonify({})
 
 
 

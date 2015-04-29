@@ -9,8 +9,11 @@ from datetime import datetime
 
 task = Blueprint('task', __name__)
 
+from api_tools import signed_auth
+
 
 @task.route('/', methods=["GET"])
+@signed_auth()
 def api_get_tasks():
     from api import db, api_return_error
     try:
@@ -21,6 +24,7 @@ def api_get_tasks():
 
 
 @task.route('/', methods=["POST"])
+@signed_auth()
 def api_post_task():
     from api import db, api_return_error
     try:
@@ -47,6 +51,7 @@ def api_post_task():
 
 
 @task.route('/<int:_id>', methods=["GET"])
+@signed_auth()
 def api_get_task(_id):
     from api import db, api_return_error
     try:
@@ -60,6 +65,7 @@ def api_get_task(_id):
 
 
 @task.route('/<string:slug>', methods=["GET"])
+@signed_auth()
 def api_get_task_slug(slug):
     from api import db, api_return_error
     try:
@@ -73,6 +79,7 @@ def api_get_task_slug(slug):
 
 
 @task.route('/project/<int:_id>', methods=["GET"])
+@signed_auth()
 def api_get_task_project(_id):
     from api import db, api_return_error
     try:
@@ -86,6 +93,7 @@ def api_get_task_project(_id):
 
 
 @task.route('/<int:_id>', methods=["PUT"])
+@signed_auth()
 def api_put_task(_id):
     from api import db, api_return_error
     try:
@@ -115,6 +123,7 @@ def api_put_task(_id):
     return jsonify(t.serialize), 200
 
 @task.route('/<int:_id>', methods=["PATCH"])
+@signed_auth()
 def api_patch_task(_id):
     from api import db, api_return_error
     try:

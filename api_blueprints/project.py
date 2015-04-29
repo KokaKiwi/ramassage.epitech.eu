@@ -9,7 +9,11 @@ from datetime import datetime
 
 project = Blueprint('project', __name__)
 
+from api_tools import signed_auth
+
+
 @project.route('/', methods=["GET"])
+@signed_auth()
 def api_get_projects():
     from api import db, api_return_error
     try:
@@ -20,6 +24,7 @@ def api_get_projects():
 
 
 @project.route('/', methods=["POST"])
+@signed_auth()
 def api_post_project():
     # module_code, slug, token, scolaryear,
     # module_title, module_code, instance_code,
@@ -95,6 +100,7 @@ def api_post_project():
 
 
 @project.route('/<int:_id>', methods=["GET"])
+@signed_auth()
 def api_get_project(_id):
     from api import db, api_return_error
     try:
@@ -108,6 +114,7 @@ def api_get_project(_id):
     return jsonify(p.serialize), 200
 
 @project.route('/<string:token>', methods=["GET"])
+@signed_auth()
 def api_get_project_token(token):
     from api import db, api_return_error
     try:
@@ -122,6 +129,7 @@ def api_get_project_token(token):
 
 
 @project.route('/slug/<string:slug>', methods=["GET"])
+@signed_auth()
 def api_get_project_slug(slug):
     from api import db, api_return_error
     try:
@@ -136,6 +144,7 @@ def api_get_project_slug(slug):
 
 
 @project.route('/<int:_id>', methods=["PUT"])
+@signed_auth()
 def api_put_project(_id):
     from api import db, api_return_error
     try:
@@ -206,6 +215,7 @@ def api_put_project(_id):
 
 
 @project.route('/<int:_id>', methods=["PATCH"])
+@signed_auth()
 def api_patch_project(_id):
     from api import db, api_return_error
     try:

@@ -9,7 +9,10 @@ user = Blueprint('user', __name__)
 
 from api import db, api_return_error
 
+from api_tools import signed_auth
+
 @user.route('/', methods=["GET"])
+@signed_auth()
 def api_get_users():
     try:
         users = db.session.query(User).all()
@@ -18,6 +21,7 @@ def api_get_users():
     return jsonify({"users": [u.serialize for u in users]}), 200
 
 @user.route('/', methods=["POST"])
+@signed_auth()
 def api_post_user():
     try:
         datas = request.json
@@ -36,6 +40,7 @@ def api_post_user():
     return jsonify(u.serialize), 201
 
 @user.route('/<int:_id>', methods=["GET"])
+@signed_auth()
 def api_get_user(_id):
     try:
         u = db.session.query(User).get(_id)
@@ -48,6 +53,7 @@ def api_get_user(_id):
     return jsonify(u.serialize), 200
 
 @user.route('/<string:login>', methods=["GET"])
+@signed_auth()
 def api_get_user_login(login):
     try:
         u = db.session.query(User).filter_by(login=login).first()
@@ -60,6 +66,7 @@ def api_get_user_login(login):
     return jsonify(u.serialize), 200
 
 @user.route('/<int:id>', methods=["PUT"])
+@signed_auth()
 def api_put_user(id):
     try:
         datas = request.json
@@ -83,6 +90,7 @@ def api_put_user(id):
     return jsonify(u.serialize), 200
 
 @user.route('/<int:id>', methods=["PATCH"])
+@signed_auth()
 def api_patch_user(id):
     try:
         datas = request.json
@@ -105,6 +113,7 @@ def api_patch_user(id):
     return jsonify(u.serialize), 200
 
 @user.route('/<int:id>', methods=["DELETE"])
+@signed_auth()
 def api_delete_user(id):
     try:
         datas = request.json
