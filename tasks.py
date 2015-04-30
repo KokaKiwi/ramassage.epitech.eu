@@ -16,7 +16,7 @@ from datetime import datetime
 app = Celery('tasks')
 app.config_from_object("workerconfig")
 
-engine = create_engine(config.SQL_DB_URI, echo=True)
+engine = create_engine(config.SQL_DB_URI, echo=True, pool_recycle=3600)
 from sqlalchemy.orm import sessionmaker
 Session = sessionmaker()
 Session.configure(bind=engine)
