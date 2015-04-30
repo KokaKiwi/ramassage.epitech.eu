@@ -1,6 +1,7 @@
 from celery import Celery
 from actions.fetch import Fetch
 from celery.bin.celery import result
+from celery.result import AsyncResult
 from sqlalchemy import create_engine
 import config
 from models import Project
@@ -24,6 +25,15 @@ Session.configure(bind=engine)
 @app.task
 def add(x, y):
         return x + y
+
+@app.task()
+def fetch_onerror(uuid, token, retry):
+    print('Task %s raised exception' % uuid)
+    if retry < 2:
+        print("Retry fetch(%s): #%s" % (token, retry))
+        fetch.apply_async(args=[token], link_error=fetch_onerror.s(token, retry + 1),
+                          countdown=120)
+    # relaunch T.apply_async(countdown=60
 
 @app.task
 def fetch(token):

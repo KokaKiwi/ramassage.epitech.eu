@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 from api_tools import intranet_auth
 from tasks import fetch
+from tasks import fetch_onerror
 river = Blueprint('river', __name__)
 
 
@@ -15,7 +16,7 @@ river = Blueprint('river', __name__)
 @intranet_auth()
 def api_get_river():
     token = request.args["token"]
-    fetch.delay(token)
+    fetch.apply_async(args=[token], link_error=fetch_onerror.s(token, 0))
     return jsonify({"status": "Success", "token": str(token)})
 
 
