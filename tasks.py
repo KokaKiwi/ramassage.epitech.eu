@@ -51,7 +51,7 @@ def pickup_complete(repos, task_id, project):
     # archive, distribute, correction, triche
     p = Pickup(task_id, project)
     p.archive()
-    #p.distribute()
+    p.distribute()
     p.clean_all()
     return None
 
@@ -59,7 +59,14 @@ def pickup_complete(repos, task_id, project):
 @app.task
 def retrieve_scm(task_id, project, user):
     p = Pickup(task_id, project)
-    return p.one(user)
+    succeed, repo = p.one(user)
+    session = Session()
+    #try:
+    #    session.query(Project_Student).filter_by(project_id=project["id"], student)
+    #finally:
+    #    session.close()
+    #TODO:update DB
+    return succeed
 
 
 

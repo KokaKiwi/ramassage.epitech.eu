@@ -110,7 +110,8 @@ class FsMixin(object):
         return filename if with_extension else file_spec
 
     def _distribute_for_user(self, datas, filepath, filename):
-        path = config.DISTRIBUTE_DIR % datas
+        path = os.path.join(config.WORKING_DIR, "jail", config.DISTRIBUTE_DIR_IN_JAIL % datas)
+        logging.warning("_distribute_for_user path(%s)" % path)
         if not os.path.exists(path):
             self._makedirs(path, safe=True)
         if os.path.exists(os.path.join(path, filename)):
@@ -124,24 +125,6 @@ class FsMixin(object):
             "slug": slug,
         }
         for user in users:
-            datas["login"] = user
+            datas["login"] = user["login"]
             self._distribute_for_user(datas, filepath, filename)
 
-    def distribute(self, task, filename, filepath=config.ARCHIVE_DIR):
-        if "resp" in task and not isinstance(task["resp"], list):
-            task["resp"] = [task["resp"]]
-        if "template_resp" in task and not isinstance(task["template_resp"], list):
-            task["template_resp"] = [task["template_resp"]]
-        if "assistants" in task and not isinstance(task["assistants"], list):
-                task["assistants"] = [task["assistants"]]
-        if "triche" in task and task["triche"]:
-            if "template_resp" in task:
-                task["template_resp"].append(config.TRICHE_LOGIN)
-            else:
-                task["template_resp"] = [config.TRICHE_LOGIN]
-        if "resp" in task:
-            self._distribute(task["resp"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
-        if "template_resp" in task:
-            self._distribute(task["template_resp"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
-        if "assistants" in task:
-            self._distribute(task["assistants"], filename, task["scolaryear"], task["codemodule"], task["slug"], filepath)
