@@ -1,5 +1,6 @@
 from celery import Celery
 from actions.fetch import Fetch
+from actions.pickup import Pickup
 from celery.bin.celery import result
 from celery.result import AsyncResult
 from sqlalchemy import create_engine
@@ -13,6 +14,8 @@ import logging
 from sqlalchemy.exc import IntegrityError
 import json
 from datetime import datetime
+from celery import chord
+from celery import chain
 
 app = Celery('tasks')
 app.config_from_object("workerconfig")
@@ -25,6 +28,42 @@ Session.configure(bind=engine)
 @app.task
 def add(x, y):
         return x + y
+
+@app.task
+def pickup_task(task_id):
+    session = Session()
+    try:
+        task = session.query(Task).get(task_id)
+        if not task:
+            raise Exception("This task does not exist.")
+        project = task.project.serialize
+        return chord((retrieve_scm.s(task_id, project, u["user"]["login"]) for u in project["students"]),
+              pickup_complete.s(task_id, project)).apply_async()
+    except IntegrityError:
+            session.rollback()
+    finally:
+        session.close()
+
+
+@app.task
+def pickup_complete(repos, task_id, project):
+    #chain (add.s(4, 4), mul.s(8), mul.s(10))
+    # archive, distribute, correction, triche
+    p = Pickup(task_id, project)
+    p.archive()
+    #p.distribute()
+    p.clean_all()
+    return None
+
+
+@app.task
+def retrieve_scm(task_id, project, user):
+    p = Pickup(task_id, project)
+    return p.one(user)
+
+
+
+
 
 @app.task()
 def fetch_onerror(uuid, token, retry):

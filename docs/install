@@ -41,7 +41,7 @@ Retrieve ramassage-tek private key
 
 .ssh/config
 ```
-[git.epitech.eu]
-	IdentityFile .ssh/id_rsa_ramassage
+Host git.epitech.eu
+	IdentityFile ~/.ssh/id_rsa_tek
 ```
 

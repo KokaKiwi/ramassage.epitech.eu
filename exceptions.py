@@ -23,3 +23,11 @@ class FieldsMissing(Exception):
 
     def __str__(self):
         return self.msg
+
+
+class RepositoryNameMissing(Exception):
+    def __init__(self, msg='Repository name is missing.'):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg

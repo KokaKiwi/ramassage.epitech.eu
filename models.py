@@ -144,6 +144,11 @@ class Project(Base):
     last_action = Column(DateTime, nullable=True)
     tasks = relationship("Task", backref=backref("project"))
 
+
+    @property
+    def city(self):
+        return self.location.split("/")[1]
+
     def __repr__(self):
         return "<Project id='%s', token='%s', template_id='%s', template='%s', scolaryear='%s', " \
                "module_title='%s', module_code='%s', instance_code='%s', location='%s', title='%s', " \
@@ -168,6 +173,7 @@ class Project(Base):
             "module_code": self.module_code,
             "instance_code": self.instance_code,
             "location": self.location,
+            "city": self.city,
             "title": self.title,
             "deadline": dump_datetime(self.deadline, split=False),
             "promo": self.promo,

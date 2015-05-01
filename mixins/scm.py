@@ -22,7 +22,8 @@ class GitRepository(ExecMixin, FsMixin):
         logging.debug("GitRepository::clone uri(%s), local_uri(%s)" % (self._uri, self._local_uri))
         if os.path.exists(self._local_uri) and os.listdir(self._local_uri):
             logging.warning("GitRepository::clone local_uri(%s) not empty" % (self._local_uri))
-            return False
+            self._rmtree(self._local_uri, True)
+            #return False
         self._date = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
         res = self._safe_exec(["git", "clone", "--depth", str(config.GIT_MAX_DEPTH), self._uri, self._local_uri], timeout=config.GIT_CLONE_TIMEOUT)
         if res.return_code == 0:
@@ -55,23 +56,24 @@ class GitRepository(ExecMixin, FsMixin):
         raise NotImplemented()
 
     def infos(self): # generate .pickup
-        if os.path.exists(self._local_uri):
-            with open(os.path.join(self._local_uri, ".pickup"), "w") as f:
-                res = self._safe_exec("git config --get remote.origin.url", cwd=self._local_uri)
-                f.write("Repo: %s\n" % (res.outs.decode("utf-8").replace("\r", "").replace("\n", "")))
-                f.write("City: %s\n" % self._city)
-                f.write("Status: %s\n" % self._status)
-                f.write("Logs: %s\n" % self._messages)
-                f.write("Date: %s\n" % self._date)
-                f.write("Remote Branches:\n")
-                res = self._safe_exec("git branch -r", cwd=self._local_uri)
-                f.write(res.outs.decode("utf-8"))
-                f.write("Local Branches:\n")
-                res = self._safe_exec("git branch", cwd=self._local_uri)
-                f.write(res.outs.decode("utf-8"))
-                f.write("Git graph && Last commit:\n")
-                res = self._safe_exec("git log --graph --pretty=medium -n 5", cwd=self._local_uri)
-                f.write(res.outs.decode("utf-8"))
+        if not os.path.exists(self._local_uri):
+            self._makedirs(self._local_uri, True)
+        with open(os.path.join(self._local_uri, ".pickup"), "w") as f:
+            res = self._safe_exec("git config --get remote.origin.url", cwd=self._local_uri)
+            f.write("Repo: %s\n" % (res.outs.decode("utf-8").replace("\r", "").replace("\n", "")))
+            f.write("City: %s\n" % self._city)
+            f.write("Status: %s\n" % self._status)
+            f.write("Logs: %s\n" % self._messages)
+            f.write("Date: %s\n" % self._date)
+            f.write("Remote Branches:\n")
+            res = self._safe_exec("git branch -r", cwd=self._local_uri)
+            f.write(res.outs.decode("utf-8"))
+            f.write("Local Branches:\n")
+            res = self._safe_exec("git branch", cwd=self._local_uri)
+            f.write(res.outs.decode("utf-8"))
+            f.write("Git graph && Last commit:\n")
+            res = self._safe_exec("git log --graph --pretty=medium -n 5", cwd=self._local_uri)
+            f.write(res.outs.decode("utf-8"))
 
 
     def clean(self):
