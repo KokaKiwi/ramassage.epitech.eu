@@ -17,7 +17,6 @@ class Pickup(GitMixin):
         logging.info("Pickup.one(%s)" % (login))
         succeed, repo = self._retrieve_repository(login, self._project["template"]["repository_name"],
                                   self._task_id, self._project["city"])
-        print(repo._messages)
         return succeed, repo
 
     def clean_all(self):

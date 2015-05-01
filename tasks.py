@@ -58,13 +58,24 @@ def pickup_complete(repos, task_id, project):
 
 @app.task
 def retrieve_scm(task_id, project, user):
+    begin = datetime.now()
     p = Pickup(task_id, project)
     succeed, repo = p.one(user)
     session = Session()
-    #try:
-    #    session.query(Project_Student).filter_by(project_id=project["id"], student)
-    #finally:
-    #    session.close()
+    try:
+        obj = session.query(Project_Student).join(User).filter(Project_Student.project_id==project["id"]).filter(User.login==user).first()
+        obj.status = "Succeed" if succeed else "Failed"
+        obj.logs = repo._messages
+        obj.begin_date = begin
+        obj.end_date = datetime.now()
+
+        session.add(obj)
+        session.commit()
+    except Exception as e:
+        logging.warning(e)
+        session.rollback()
+    finally:
+        session.close()
     #TODO:update DB
     return succeed
 
