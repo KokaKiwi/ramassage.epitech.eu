@@ -28,5 +28,6 @@ class Pickup(GitMixin):
     def archive(self):
         repos_uri = os.path.join(config.REPOS_DIR, "%(task_id)s/%(repos)s" %
                                  {"task_id": self._task_id, "repos": self._project["template"]["repository_name"]})
-        return self._archive(config.ARCHIVE_DIR, "%s-%s" % (self._project["title"], self._project["city"]),
+        arch = self._cleanfilename("%s-%s" % (self._project["title"], self._project["city"]))
+        return self._archive(config.ARCHIVE_DIR, arch,
                       repos_uri, versioned=True)
