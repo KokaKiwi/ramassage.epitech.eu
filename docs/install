@@ -45,3 +45,10 @@ Host git.epitech.eu
 	IdentityFile ~/.ssh/id_rsa_tek
 ```
 
+
+```
+# apt-get install libpam-pwdfile
+
+
+```
+

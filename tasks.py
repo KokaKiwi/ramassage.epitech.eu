@@ -76,7 +76,6 @@ def retrieve_scm(task_id, project, user):
         session.rollback()
     finally:
         session.close()
-    #TODO:update DB
     return succeed
 
 
