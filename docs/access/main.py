@@ -5,6 +5,7 @@ import datetime
 import csv
 import bcrypt
 import config
+import logging
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -29,10 +30,13 @@ class Auth(object):
 
 @auth.verify_password
 def authenticate(username=None, password=None):
+    logging.info("authenticate: %s" % username)
     if not os.path.exists(os.path.join(config.BASE_DIR, username)):
+        logging.warning("authenticate: %s, path not found" % username)
         return None
     if Auth.checkInPasswd(username, password):
         return True
+    logging.warning("authenticate: %s, password mismatch" % username)
     return None
 
 def sizeof_fmt(num, suffix='B'):
