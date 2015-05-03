@@ -45,6 +45,39 @@ def pickup_task(task_id):
         session.close()
 
 
+
+@app.task
+def scheduled_launch(task_id, token):
+    session = Session()
+    try:
+        obj = session.query(Task).get(task_id)
+        obj.status = "ongoing"
+        session.add(obj)
+        session.commit()
+        chain(fetch.si(token), pickup_task.si(task_id), scheduled_launch_done.si(task_id))()
+        return True
+    except Exception as e:
+        logging.warning(e)
+        session.rollback()
+    finally:
+        session.close()
+    return False
+
+@app.task
+def scheduled_launch_done(task_id):
+    session = Session()
+    try:
+        obj = session.query(Task).get(task_id)
+        obj.status = "succeed"
+        session.add(obj)
+        session.commit()
+    except Exception as e:
+        logging.warning(e)
+        session.rollback()
+    finally:
+        session.close()
+    return True
+
 @app.task
 def pickup_complete(repos, task_id, project):
     #chain (add.s(4, 4), mul.s(8), mul.s(10))
@@ -77,8 +110,6 @@ def retrieve_scm(task_id, project, user):
     finally:
         session.close()
     return succeed
-
-
 
 
 
@@ -158,7 +189,7 @@ def fetch(token):
         session.add(t)
         rescheduled = False
         for task in t.tasks:
-            if task.type == "auto":
+            if task.type == "auto" and task.status != "ongoing":
                 task.launch_date = t.deadline
                 session.add(task)
                 rescheduled = True

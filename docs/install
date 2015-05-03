@@ -1,6 +1,6 @@
 ```
 # apt-get install python3 supervisor git mysql-server-5.5 mysql-client-5.5 python3-pip libmysqlclient-dev python3-dev build-essential
-# apt-get install libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.1-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libcurl4-openssl-dev
+# apt-get install libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.1-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libcurl4-openssl-dev libffi-dev
 $ cd /tmp
 $ wget https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
 $ tar -zxf Python-3.4.3.tgz
@@ -34,6 +34,8 @@ $ python3 models.py init
 # supervisorctl reread
 # supervisorctl update
 # supervisorctl start ramassage_api
+# supervisorctl start ramassage_tasks
+# supervisorctl start ramassage_files
 ```
 
 
@@ -47,8 +49,6 @@ Host git.epitech.eu
 
 
 ```
-# apt-get install libpam-pwdfile
-
 
 ```
 

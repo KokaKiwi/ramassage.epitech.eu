@@ -60,6 +60,7 @@ def index(path=""):
     if len(d) < len(os.path.join(config.BASE_DIR, auth.username())):
         return "Not allowed", 403
     if os.path.isfile(d):
+        logging.warning("send_from_directory: %s, %s" % (os.path.join(config.BASE_DIR, auth.username()), path))
         return send_from_directory(os.path.join(config.BASE_DIR, auth.username()), path)
 
     output += "{:<60}{:^20}{:>10}\r\n".format("..", "-", "-").replace("..", "<a href='/%s'>..</a>" %
