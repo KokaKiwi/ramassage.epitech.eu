@@ -31,18 +31,21 @@ class Scheduler(object):
         session.commit()
 
     def run(self):
-        session = Session()
         while True:
-            tasks = session.query(Task).filter_by(status="todo").filter(Task.launch_date < datetime.now()).all()
-            for task in tasks:
-                print("task <id: %s, launch_date, status=%s>")
-                task.status = "ongoing"
-                session.add(task)
-                session.commit()
-                scheduled_launch.delay(task.id, task.project.token)
+            session = Session()
+            try:
+                tasks = session.query(Task).filter_by(status="todo").filter(Task.launch_date < datetime.now()).all()
+                for task in tasks:
+                    print("task <id: %s, launch_date, status=%s>")
+                    task.status = "ongoing"
+                    session.add(task)
+                    session.commit()
+                    scheduled_launch.delay(task.id, task.project.token)
 
-            print(tasks)
-            time.sleep(5)
+                print(tasks)
+            finally:
+                session.close()
+            time.sleep(10)
 
 
 
