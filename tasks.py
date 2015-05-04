@@ -193,7 +193,7 @@ def fetch(token):
                 task.launch_date = t.deadline
                 session.add(task)
                 rescheduled = True
-        if not rescheduled:
+        if not rescheduled and task.status != "ongoing":
             session.add(Task(type="auto", launch_date=t.deadline, project=t))
         session.commit()
         return t.serialize
