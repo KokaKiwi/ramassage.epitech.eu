@@ -5,7 +5,7 @@ import config
 import unicodedata
 import string
 
-validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+validFilenameChars = "-_.()+ %s%s" % (string.ascii_letters, string.digits)
 
 class FsMixin(object):
     def __init__(self):

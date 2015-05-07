@@ -187,13 +187,14 @@ def fetch(token):
             t.students.append(Project_Student(user=u, project=t))
 
         session.add(t)
-        rescheduled = False
+        need_new = True
         for task in t.tasks:
+            if task.type == "auto":
+                need_new = False
             if task.type == "auto" and task.status != "ongoing":
                 task.launch_date = t.deadline
                 session.add(task)
-                rescheduled = True
-        if not rescheduled and task.status != "ongoing":
+        if need_new:
             session.add(Task(type="auto", launch_date=t.deadline, project=t))
         session.commit()
         return t.serialize
