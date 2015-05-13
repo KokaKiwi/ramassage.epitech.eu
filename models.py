@@ -26,7 +26,7 @@ class User(Base):
     login = Column(String(30), unique=True, nullable=False)
 
     def __repr__(self):
-        return "<User (id='%s', firstname='%s', lastname='%s', login='%s')>" % (self.id,
+        return "User('%s', '%s %s', '%s')" % (self.id,
                                                                                    self.firstname,
                                                                                    self.lastname,
                                                                                    self.login)
@@ -51,11 +51,9 @@ class Template(Base):
     __table_args__ = (UniqueConstraint('codemodule', 'slug', name='_codemodule_slug_uc'),)
 
     def __repr__(self):
-        return "<Template id='%s', codemodule='%s', slug='%s', repository_name='%s', call_moulitriche='%s', \
-        call_judge='%s', judge_uri='%s', judge_rule='%s', judge_preliminary_exec='%s', judge_final_exec='%s', \
-        school='%s'>" % (self.id, self.codemodule, self.slug, self.repository_name, self.call_moulitriche,
-                         self.call_judge, self.judge_uri, self.judge_rule, self.judge_preliminary_exec,
-                         self.judge_final_exec, self.school)
+        return "Template('%s', '%s', '%s', repository_name='%s', '%s')" % (
+            self.id, self.codemodule, self.slug, self.repository_name, self.school)
+
     @property
     def serialize(self):
         return {
@@ -99,8 +97,8 @@ class Project_Student(Base):
     user = relationship("User")
 
     def __repr__(self):
-        return "<Project_Student project_id='%s', user_id='%s', user='%s', status='%s', logs='%s', begin_date='%s', \
-        end_date='%s'>" % (self.project_id, self.user_id, self.user.serialize, self.status, self.logs,
+        return "Project_Student(project_id='%s', '%s', '%s', logs='%s', begin_date='%s', \
+        end_date='%s')" % (self.project_id, self.user.serialize, self.status, self.logs,
                            dump_datetime(self.begin_date, split=False), dump_datetime(self.end_date, split=False))
 
     @property
@@ -150,16 +148,11 @@ class Project(Base):
         return self.location.split("/")[1]
 
     def __repr__(self):
-        return "<Project id='%s', token='%s', template_id='%s', template='%s', scolaryear='%s', " \
-               "module_title='%s', module_code='%s', instance_code='%s', location='%s', title='%s', " \
-               "deadline='%s', promo='%s', groups='%s', students='%s', resp='%s', template_resp='%s', assistants='%s', " \
-               "last_update='%s', last_action='%s'>" % (self.id, self.token, self.template_id, self.template.serialize,
-                                                        self.scolaryear, self.module_title, self.module_code,
-                                                        self.instance_code, self.location, self.title,
-                                                        dump_datetime(self.deadline, split=False), self.promo,
-                                                        self.groups, self.students, self.resp, self.template_resp,
-                                                        self.assistants, dump_datetime(self.last_update, split=False),
-                                                        dump_datetime(self.last_action, split=False))
+        return "Project('%s', token='%s', template_id='%s', '%s', " \
+               "'%s', '%s', '%s', title='%s', " \
+               "deadline='%s', promo='%s')" % (self.id, self.token, self.template_id, self.scolaryear,
+                                               self.module_title, self.instance_code, self.location, self.title,
+                                               dump_datetime(self.deadline, split=False), self.promo)
 
     @property
     def serialize(self):

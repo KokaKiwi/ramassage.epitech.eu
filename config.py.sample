@@ -45,3 +45,7 @@ API_SALT = {
     "base": "???",
     "uuid4": "??",
 }
+
+# admin
+PASSWORD_FILE = ""
+USER_WHITELIST = ["login_x"]
