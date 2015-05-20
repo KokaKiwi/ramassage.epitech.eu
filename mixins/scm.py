@@ -9,7 +9,7 @@ import os
 import time
 
 
-class GitRepository(ExecMixin, FsMixin):
+class GitRepository(FsMixin):
     def __init__(self, local_uri, uri, city=None):
         self._local_uri = local_uri
         self._uri = uri
