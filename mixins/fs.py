@@ -6,7 +6,7 @@ import unicodedata
 import string
 from .execution import ExecMixin
 
-validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+validFilenameChars = "-_.()+ %s%s" % (string.ascii_letters, string.digits)
 
 class FsMixin(ExecMixin):
     def __init__(self):
