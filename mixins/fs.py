@@ -4,10 +4,11 @@ import os, errno, shutil, stat, logging
 import config
 import unicodedata
 import string
+from .execution import ExecMixin
 
 validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
 
-class FsMixin(object):
+class FsMixin(ExecMixin):
     def __init__(self):
         pass
 
@@ -48,6 +49,12 @@ class FsMixin(object):
             raise e
         return True
 
+    def _make_archive(self, base_name, _format, root_dir):
+        res = self._safe_exec(["zip", "-ry", "%s.%s" % (base_name, _format), root_dir], timeout=60)
+        if res.return_code == 0:
+            return "%s.%s" % (base_name, _format)
+        return None
+
     def _archive(self, path, archive_name, root_dir, versioned=False, _format="zip"):
         logging.debug("_archive:: %s.zip < %s" % (archive_name, root_dir))
         if not path:
@@ -55,8 +62,10 @@ class FsMixin(object):
         archive_name = os.path.join(path, archive_name)
         if versioned:
             archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=False)
-        return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
-
+        own = self._make_archive(os.path.join(path, archive_name),  _format, root_dir)
+        if not own:
+            return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
+        return own
 
     def _new_version(self, filename, with_extension=True):
         file_spec, ext = os.path.splitext(filename)
