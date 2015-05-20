@@ -50,7 +50,7 @@ class FsMixin(ExecMixin):
         return True
 
     def _make_archive(self, base_name, _format, root_dir):
-        res = self._safe_exec(["zip", "-ry", "%s.%s" % (base_name, _format), root_dir], timeout=60)
+        res = self._safe_exec(["zip", "-ry", "%s.%s" % (base_name, _format), "."], timeout=60, cwd=root_dir)
         if res.return_code == 0:
             return "%s.%s" % (base_name, _format)
         return None
