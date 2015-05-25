@@ -3,6 +3,7 @@ __author__ = 'steven'
 
 from flask import request, Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import config
 
 
@@ -14,6 +15,7 @@ try:
 except ImportError:
     pass
 
+cors = CORS(app, resources={r"/1.0/*": {"origins": "*"}}, allow_headers=['Content-Type', 'Date', 'Authorization'])
 db = SQLAlchemy(app)
 
 
