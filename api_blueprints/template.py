@@ -63,6 +63,7 @@ def api_get_template(_id):
 
 
 @template.route('/<string:slug>', methods=["GET"])
+@template.route('/slug/<string:slug>', methods=["GET"])
 @signed_auth()
 def api_get_template_slug(slug):
     from api import db, api_return_error

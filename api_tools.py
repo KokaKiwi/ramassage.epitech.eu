@@ -67,6 +67,8 @@ def signed_auth():
                 data = request.data.decode("utf-8")
                 if request.method != "POST":
                     data = request.path
+                if uuid not in config.API_SALT:
+                    return api_return_error(403, "Not allowed", "Unknown uuid")
                 hm = hmac.new(config.API_SALT[uuid].encode("utf-8"), "{0}-{1}".format(str(int(timestamp)), data).encode("utf-8"), hashlib.sha256).hexdigest()
                 if hm == signature:
                     return f(*args, **kwargs)

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Swagger UI</title>
+  <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16" />
+  <link href='css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='css/reset.css' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='css/reset.css' media='print' rel='stylesheet' type='text/css'/>
+  <link href='css/print.css' media='print' rel='stylesheet' type='text/css'/>
+  <script src='lib/jquery-1.8.0.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.slideto.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.wiggle.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
+  <script src='lib/handlebars-2.0.0.js' type='text/javascript'></script>
+  <script src='lib/underscore-min.js' type='text/javascript'></script>
+  <script src='lib/backbone-min.js' type='text/javascript'></script>
+  <script src='swagger-ui.js' type='text/javascript'></script>
+  <script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
+  <script src='lib/marked.js' type='text/javascript'></script>
+  <script src='lib/swagger-oauth.js' type='text/javascript'></script>
+  <script src='lib/jssha256.js' type='text/javascript'></script>
+
+  <script type="text/javascript">
+		$(function () {
+		  var url = window.location.search.match(/url=([^&]+)/);
+		  if (url && url.length > 1) {
+			url = decodeURIComponent(url[1]);
+		  } else {
+			url = "http://api-ramassage.s3-website.eu-central-1.amazonaws.com/swagger.json";
+		  }
+		  window.swaggerUi = new SwaggerUi({
+			url: url,
+			dom_id: "swagger-ui-container",
+			supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+			onComplete: function(swaggerApi, swaggerUi){
+			  if(typeof initOAuth == "function") {
+				initOAuth({
+				  clientId: "your-client-id",
+				  realm: "your-realms",
+				  appName: "your-app-name"
+				});
+			  }
+
+			  $('pre code').each(function(i, e) {
+				hljs.highlightBlock(e)
+			  });
+
+			  addApiKeyAuthorization();
+			},
+			onFailure: function(data) {
+			  log("Unable to Load SwaggerUI");
+			},
+			docExpansion: "none",
+			apisSorter: "alpha"
+		  });
+		  
+		  function utf8_encode(argString) {
+
+			  if (argString === null || typeof argString === 'undefined') {
+				return '';
+			  }
+
+			  // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+			  var string = (argString + '');
+			  var utftext = '',
+				start, end, stringl = 0;
+
+			  start = end = 0;
+			  stringl = string.length;
+			  for (var n = 0; n < stringl; n++) {
+				var c1 = string.charCodeAt(n);
+				var enc = null;
+
+				if (c1 < 128) {
+				  end++;
+				} else if (c1 > 127 && c1 < 2048) {
+				  enc = String.fromCharCode(
+					(c1 >> 6) | 192, (c1 & 63) | 128
+				  );
+				} else if ((c1 & 0xF800) != 0xD800) {
+				  enc = String.fromCharCode(
+					(c1 >> 12) | 224, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+				  );
+				} else {
+				  // surrogate pairs
+				  if ((c1 & 0xFC00) != 0xD800) {
+					throw new RangeError('Unmatched trail surrogate at ' + n);
+				  }
+				  var c2 = string.charCodeAt(++n);
+				  if ((c2 & 0xFC00) != 0xDC00) {
+					throw new RangeError('Unmatched lead surrogate at ' + (n - 1));
+				  }
+				  c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+				  enc = String.fromCharCode(
+					(c1 >> 18) | 240, ((c1 >> 12) & 63) | 128, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+				  );
+				}
+				if (enc !== null) {
+				  if (end > start) {
+					utftext += string.slice(start, end);
+				  }
+				  utftext += enc;
+				  start = end = n + 1;
+				}
+			  }
+
+			  if (end > start) {
+				utftext += string.slice(start, stringl);
+			  }
+
+			  return utftext;
+			}
+		  
+
+		  function addApiKeyAuthorization(){
+			var uuid = encodeURIComponent($('#input_uuid')[0].value);
+			var secret = encodeURIComponent($('#input_secret')[0].value);
+			var CustomRequestSigner = function(name, uuid, secret) {
+			  this.name = name; 
+			  this.uuid = uuid;
+			  this.secret = secret;
+			}; 
+
+			CustomRequestSigner.prototype.apply = function(obj, authorizations) { 
+			  var datas = "";
+			  if (obj.method != "POST") {
+				var parser = document.createElement('a');
+				parser.href = obj.url;
+				datas = parser.pathname;
+			  } else {
+				datas = obj.body;
+			  }
+			  var date = new Date()
+			  timestamp = date.getTime() / 1000 | 0
+			  HMAC_SHA256_init(this.secret);
+			  HMAC_SHA256_write(utf8_encode(timestamp + "-" + datas));
+			  mac = HMAC_SHA256_finalize();
+			  mac_hex = array_to_hex_string(mac);
+			  log(timestamp + "-" + datas)
+			  log(mac_hex)
+			  obj.headers["Authorization"] = "Sign " + btoa(this.uuid + ":" + mac_hex);
+			  obj.headers["X-Date"] = date.toUTCString().replace("GMT", "-0000");
+			  log(obj);
+			  return true; 
+			};
+			
+			if(uuid && uuid.trim() != "" && secret && secret.trim() != "") {
+				window.swaggerUi.api.clientAuthorizations.add("api_signature", new CustomRequestSigner("api_signature", uuid, secret));
+			}
+			log("added key ");
+		  }
+
+		  $('#input_uuid').change(addApiKeyAuthorization);
+		  $('#input_secret').change(addApiKeyAuthorization);
+
+		  // if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
+		  
+			/*var apiUuid = "93330b53-d676-4e38-a275-4b147798366c";
+			var apiSecret = "5b10bd446259b8f2d2be0ae955b32ff9da218e5feab9cc3527819b19fa77e2e9";
+			$('#input_uuid').val(apiUuid);
+			$('#input_secret').val(apiSecret);
+		  */
+
+		  window.swaggerUi.load();
+		
+
+		  function log() {
+			if ('console' in window) {
+			  console.log.apply(console, arguments);
+			}
+		  }
+	  });
+  </script>
+</head>
+
+<body class="swagger-section">
+<div id='header'>
+  <div class="swagger-ui-wrap">
+    <a id="logo" href="http://swagger.io">swagger</a>
+    <form id='api_selector'>
+      <!--<div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>-->
+      <div class='input'><input placeholder="uuid" id="input_uuid" name="uuid" type="text"/></div>
+	  <div class='input'><input placeholder="secret" id="input_secret" name="secret" type="text"/></div>
+      <div class='input'><a id="explore" href="#">Explore</a></div>
+    </form>
+  </div>
+</div>
+
+<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
+<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+</body>
+</html>

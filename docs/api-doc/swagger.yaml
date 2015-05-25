@@ -1,0 +1,1018 @@
+# Example YAML to get you started quickly.
+# Be aware that YAML has indentation based scoping.
+# Code completion support is available so start typing for available options.
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "1.0.0"
+  title: api.ramassage.epitech.eu
+  description: |
+    Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu
+
+host: api.ramassage.epitech.eu
+basePath: /1.0
+paths:
+  /user/:
+    # This is a HTTP operation
+    get:
+      tags:
+        - user
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les objets `User`.
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+    post:
+      tags:
+        - user
+      description: |
+        Créer un nouveau `User`.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+  /user/{user_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - user
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `User` correspondant à l'**userId**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: user_id
+          description: ID ou login de l'utilisateur
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/User"
+        404:
+          description: "User #{userId} not found"
+          schema:
+              $ref: "#/definitions/Error"
+    put:
+      tags:
+        - user
+      description: |
+        Modifier un  `User`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: user_id
+          description: ID de l'utilisateur uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "User not found"
+          schema:
+              $ref: "#/definitions/Error"
+    patch:
+      tags:
+        - user
+      description: |
+        Modifier un champ de `User`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: user_id
+          description: ID de l'utilisateur uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: false
+          schema:
+            $ref: "#/definitions/User"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "User not found"
+          schema:
+              $ref: "#/definitions/Error"
+    delete:
+      tags:
+        - user
+      description: |
+        Supprimer un `User`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: user_id
+          description: ID de l'utilisateur uniquement
+          required: true
+          type: integer
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        404:
+          description: "User not found"
+          schema:
+              $ref: "#/definitions/Error"
+
+
+  /template/:
+    # This is a HTTP operation
+    get:
+      tags:
+        - template
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les objets `Template`.
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Template"
+    post:
+      tags:
+        - template
+      description: |
+        Créer un nouveau `Template`.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Template"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Template"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+
+  /template/{template_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - template
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `Template` correspondant à l'**template_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: template_id
+          description: ID du Template
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/Template"
+        409:
+          description: "Template #{template_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
+    put:
+      tags:
+        - template
+      description: |
+        Modifier un  `Template`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: template_id
+          description: ID du Template uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Template"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Template"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Template not found"
+          schema:
+              $ref: "#/definitions/Error"
+    patch:
+      tags:
+        - template
+      description: |
+        Modifier un champ de `Template`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: template_id
+          description: ID du Template uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: false
+          schema:
+            $ref: "#/definitions/Template"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Template"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Template not found"
+          schema:
+              $ref: "#/definitions/Error"
+
+  /template/slug/{slug}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - template
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `Template` correspondant au **slug**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: slug
+          description: Slug du Template
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Template"
+        404:
+          description: "Template #{template_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
+
+  /task/:
+    # This is a HTTP operation
+    get:
+      tags:
+        - task
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les objets `Task`.
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Task"
+    post:
+      tags:
+        - task
+      description: |
+        Créer une nouvelle `Task`.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Task"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Task"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+
+  /task/{task_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - task
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `Task` correspondant à la **task_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: task_id
+          description: ID de la Task
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/Task"
+        404:
+          description: "Task #{task_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
+    put:
+      tags:
+        - task
+      description: |
+        Modifier un  `Task`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: task_id
+          description: ID de la Task uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Task"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Task"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Task not found"
+          schema:
+              $ref: "#/definitions/Error"
+    patch:
+      tags:
+        - task
+      description: |
+        Modifier un champ de la `Task`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: task_id
+          description: ID de la Task uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: false
+          schema:
+            $ref: "#/definitions/Task"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Task"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Task not found"
+          schema:
+              $ref: "#/definitions/Error"
+  /task/project/{project_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - template
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les `Task` liées au Project correspondant à **project_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: project_id
+          description: ID du projet
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Task"
+        404:
+          description: "Project #{project_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
+  /project/:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les objets `Project`.
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+    post:
+      tags:
+        - project
+      description: |
+        Créer un nouveau `Project`.
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Project"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        201:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+
+  /project/{project_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `Project` correspondant au **project_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: project_id
+          description: ID du Project
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/Project"
+        404:
+          description: "Project #{project_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
+    put:
+      tags:
+        - project
+      description: |
+        Modifier un  `Project`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: project_id
+          description: ID du Project uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Project"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Project not found"
+          schema:
+              $ref: "#/definitions/Error"
+    patch:
+      tags:
+        - project
+      description: |
+        Modifier un champ de la `Project`.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: project_id
+          description: ID du Project uniquement
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: false
+          schema:
+            $ref: "#/definitions/Project"
+      security:
+        - api_signature: []
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+        409:
+          description: "Conflict"
+          schema:
+              $ref: "#/definitions/Error"
+        404:
+          description: "Project not found"
+          schema:
+              $ref: "#/definitions/Error"
+			  
+  /project/slug/{slug}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - template
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les `Project` liés au **slug**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: slug
+          description: Slug correspondant au Template
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Project"
+        404:
+          description: "Template #{slug} not found"
+          schema:
+              $ref: "#/definitions/Error"
+  /project/token/{token}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer l'objet `Project` correspondant au **token**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: token
+          description: Token Project
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/Project"
+        404:
+          description: "Project #{token} not found"
+          schema:
+              $ref: "#/definitions/Error"
+
+securityDefinitions:
+  api_signature:
+    type: apiKey
+    name: Authorization
+    in: header
+    
+definitions:
+  Error:
+    properties:
+      status:
+        type: integer
+      title:
+        type: string
+      detail:
+        type: string
+        description: Message plus explicite de l'erreur
+      id: 
+        type: string
+      code: 
+        type: integer
+  User:
+    required:
+      - firstname
+      - lastname
+      - login
+    properties:
+      id:
+        type: integer
+      firstname:
+        type: string
+      lastname:
+        type: string
+      login: 
+        type: string
+  Template:
+    properties:
+      id:
+        type: integer
+      codemodule: 
+        type: string 
+      slug:  
+        type: string
+      repository_name:  
+        type: string
+        description: "Nom du dépôt à ramasser"
+      call_moulitriche: 
+        type: boolean
+        description: "Appel au webservice de triche ?"
+      call_judge: 
+        type: boolean
+        description: "Correction?"
+      judge_uri: 
+        type: string
+        description: "login@machine_de_correction"
+      judge_rule: 
+        type: string
+        description: "'Rule' identifiant unique coté correction"
+      judge_preliminary_exec: 
+        type: string
+        description: "Commande de correction pour les préliminaires"
+      judge_final_exec: 
+        type: string
+        description: "Commande de correction pour le rendu final"
+      school:  
+        type: string
+        description: "" 
+  Project_Student:
+    properties:
+      id:
+        type: integer
+      user_id:
+        type: integer
+      user:
+        $ref: "#/definitions/User"
+      project_id:
+        type: integer
+      project:
+        $ref: "#/definitions/Project"
+      status: 
+        type: string
+      logs: 
+        type: string
+      begin_date: 
+        type: string
+        format: date-time
+        description: Datetime mysql format
+      end_date: 
+        type: string
+        format: date-time
+        description: Datetime mysql format
+  Project:
+    properties:
+      id:
+        type: integer
+      token:
+        type: string
+      template_id:
+        type: integer
+      template:
+        $ref: "#/definitions/Template"
+      scolaryear:
+        type: integer
+      module_title:
+        type: string
+      module_code:
+        type: string
+      instance_code:
+        type: string
+      location:
+        type: string
+      city:
+        type: string
+      title:
+        type: string
+      deadline:
+        type: string
+        format: date-time
+        description: Datetime mysql format
+      promo:
+        type: integer
+      groups:
+        type: string
+        description: json dump of groups
+      students:
+        type: array
+        items:
+          $ref: "#/definitions/Project_Student"
+      resp:
+        type: array
+        items:
+          $ref: "#/definitions/User"
+      template_resp:
+        type: array
+        items:
+          $ref: "#/definitions/User"
+      assistants:
+        type: array
+        items:
+          $ref: "#/definitions/User"
+      last_update:
+        type: string
+        format: date-time
+        description: Datetime mysql format
+      last_action:
+        type: string
+        format: date-time
+        description: Datetime mysql format
+      tasks:
+        type: array
+        items:
+          $ref: "#/definitions/Task"
+  Task:
+    properties:
+      id:
+        type: integer
+      type:
+        type: string
+        description: Enum("auto", "preliminary", "manual")
+      launch_date:
+        type: string
+        format: date-time
+        description: Datetime mysql format
+      status:
+        type: string
+        description: Enum("ongoing", "todo", "succeed", "failed")
+      project_id:
+        type: integer
+      project:
+        $ref: "#/definitions/Project"
+      exec_cmd:
+        type: string
+      extend: 
+        type: string
+        description: Json dump

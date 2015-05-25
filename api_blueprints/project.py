@@ -113,6 +113,8 @@ def api_get_project(_id):
         return api_return_error(500, "Server error", str(e))
     return jsonify(p.serialize), 200
 
+
+@project.route('/token/<string:token>', methods=["GET"])
 @project.route('/<string:token>', methods=["GET"])
 @signed_auth()
 def api_get_project_token(token):
