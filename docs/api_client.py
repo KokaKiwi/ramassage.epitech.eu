@@ -28,7 +28,7 @@ class Client(object):
 
     def _sign(self, d, method, url, datas=None):
         if method == "POST":
-            data = datas if datas else ""
+            data = datas.decode("utf-8") if datas else ""
         else:
             data = url
         print("data: %s" % "{0}-{1}".format(str(int(time.mktime(d.timetuple()))),
@@ -51,8 +51,8 @@ class Client(object):
         #headers = {"Content-type": "application/x-www-form-urlencoded"}
         headers = {"Content-type": "application/json"}
         d = datetime.datetime.now(pytz.timezone('Europe/Paris'))
-        headers["Date"] = d.strftime('%a, %d %b %Y %H:%M:%S %Z')
-
+        headers["Date"] = d.strftime('%a, %d %b %Y %H:%M:%S %z')
+        print("Date: %s" % headers["Date"])
         headers["Authorization"] = self._sign(d, method, url, json.dumps(datas).encode("utf-8"))
         print("Authorization: %s" % headers["Authorization"])
         #conn.request(method, url, urllib.urlencode(datas) if datas else None, headers=headers)

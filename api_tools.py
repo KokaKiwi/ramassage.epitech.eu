@@ -37,12 +37,21 @@ def signed_auth():
         def wrapped(*args, **kwargs):
             from api import api_return_error
             if "Authorization" in request.headers:
-                if "Date" not in request.headers:
+                if "Date" not in request.headers and "X-Date" not in request.headers:
                     return api_return_error(400, "Bad Request", "Date missing")
-                timestamp = int(time.mktime(eut.parsedate(request.headers["Date"])))
+
+                date_tuple = eut.parsedate_tz(request.headers["Date"] if "Date" in request.headers
+                                                          else request.headers["X-Date"])
+                d_client = datetime.datetime.fromtimestamp(eut.mktime_tz(date_tuple))
+                #timestamp = int(time.mktime(eut.parsedate(request.headers["Date"] if "Date" in request.headers
+                #                                          else request.headers["X-Date"])))
+                timestamp = time.mktime(d_client.timetuple())
+                logging.warning("date_tuple %s" % str(d_client.strftime("%a, %d %b %Y %H:%M:%S")))
                 d_now = datetime.datetime.now(pytz.timezone('Europe/Paris'))
                 now = time.mktime(d_now.timetuple())
-                if abs(int(now) - timestamp) > 60 * 15:
+                logging.info("Date : client(%s), server(%s) : delta(%s)" % (int(timestamp), int(now),
+                                                                               abs(int(now) - int(timestamp))))
+                if abs(int(now) - int(timestamp)) > 60 * 15:
                     return api_return_error(400, "Bad Request", "Time screw")
                 auth = request.headers["Authorization"].split(" ")
                 if "Sign" not in auth[0]:
@@ -55,10 +64,10 @@ def signed_auth():
                     signature = tup[1]
                 else:
                     signature = tup[0]
-                data = request.data
+                data = request.data.decode("utf-8")
                 if request.method != "POST":
                     data = request.path
-                hm = hmac.new(config.API_SALT[uuid].encode("utf-8"), "{0}-{1}".format(str(timestamp), data).encode("utf-8"), hashlib.sha256).hexdigest()
+                hm = hmac.new(config.API_SALT[uuid].encode("utf-8"), "{0}-{1}".format(str(int(timestamp)), data).encode("utf-8"), hashlib.sha256).hexdigest()
                 if hm == signature:
                     return f(*args, **kwargs)
                 logging.warning("Signature header: %s" % signature)

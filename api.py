@@ -15,7 +15,7 @@ try:
 except ImportError:
     pass
 
-cors = CORS(app, resources={r"/1.0/*": {"origins": "*"}}, allow_headers=['Content-Type', 'Date', 'Authorization'])
+cors = CORS(app, resources={r"/1.0/*": {"origins": "*"}}, allow_headers=['Content-Type', 'Date', 'Authorization', 'X-Date'])
 db = SQLAlchemy(app)
 
 
