@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.0.0",
+        "version": "1.0.1",
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
@@ -361,7 +361,7 @@
                             "$ref": "#/definitions/Template"
                         }
                     },
-                    "409": {
+                    "404": {
                         "description": "Template #{template_id} not found",
                         "schema": {
                             "$ref": "#/definitions/Error"
@@ -782,7 +782,7 @@
                 "tags": [
                     "project"
                 ],
-                "description": "Récupérer les objets `Project`.\n",
+                "description": "Récupérer les `Project` en cours (où la date de fin se situe au delà de maintenant).\n",
                 "produces": [
                     "application/json"
                 ],
@@ -1066,6 +1066,144 @@
                     },
                     "404": {
                         "description": "Project #{token} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/past": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer les `Project` passés (où la date de fin se situe avant aujourd'hui).\n",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Project"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/all": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer tous les `Project`.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Project"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/user/{login}": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer les `Project` courant de l'étudiant **login**.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "login",
+                        "description": "Login de l'étudiant",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Project"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User #{login} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/all/user/{login}": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer tous les `Project` de l'étudiant **login**.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "login",
+                        "description": "Login de l'étudiant",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Project"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User #{login} not found",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }

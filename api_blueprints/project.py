@@ -17,10 +17,32 @@ from api_tools import signed_auth
 def api_get_projects():
     from api import db, api_return_error
     try:
+        projects = db.session.query(Project).filter(Project.deadline>=datetime.now()).all()
+    except Exception as e:
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"projects": [p.serialize for p in projects]}), 200
+
+
+@project.route('/past', methods=["GET"])
+@signed_auth()
+def api_get_projects_past():
+    from api import db, api_return_error
+    try:
+        projects = db.session.query(Project).filter(Project.deadline<datetime.now()).all()
+    except Exception as e:
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"projects": [p.serialize for p in projects]}), 200
+
+@project.route('/all', methods=["GET"])
+@signed_auth()
+def api_get_projects_all():
+    from api import db, api_return_error
+    try:
         projects = db.session.query(Project).all()
     except Exception as e:
         return api_return_error(500, "Server error", str(e))
     return jsonify({"projects": [p.serialize for p in projects]}), 200
+
 
 
 @project.route('/', methods=["POST"])
@@ -138,6 +160,45 @@ def api_get_project_slug(slug):
         projects = db.session.query(Project).join(Project.template).filter(Template.slug==slug).all()
         if not projects:
             return api_return_error(404, "Slug %s not found" % slug)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"projects": [p.serialize for p in projects]}), 200
+
+
+@project.route('/user/<string:login>', methods=["GET"])
+@signed_auth()
+def api_get_project_current_student(login):
+    from api import db, api_return_error
+    try:
+        # Si chef de groupe uniquement :
+        #projects = db.session.query(Project).join(Project_Student, Project_Student.project_id == Project.id)\
+        #    .join(User, User.id == Project_Student.user_id).filter(User.login==login)\
+        #    .filter(Project.deadline>=datetime.now()).all()
+        projects = db.session.query(Project).join(Project_Student, Project_Student.project_id == Project.id)\
+            .join(User, User.id == Project_Student.user_id).filter(Project.groups.like('%{0}%'.format(login)))\
+            .filter(Project.deadline>=datetime.now()).all()
+        if not projects:
+            return api_return_error(404, "User %s not found" % login)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"projects": [p.serialize for p in projects]}), 200
+
+@project.route('/all/user/<string:login>', methods=["GET"])
+@signed_auth()
+def api_get_project_all_student(login):
+    from api import db, api_return_error
+    try:
+        # Si chef de groupe uniquement :
+        #projects = db.session.query(Project).join(Project_Student, Project_Student.project_id == Project.id)\
+        #    .join(User, User.id == Project_Student.user_id).filter(User.login==login).all()
+        projects = db.session.query(Project).join(Project_Student, Project_Student.project_id == Project.id)\
+            .join(User, User.id == Project_Student.user_id).filter(Project.groups.like('%{0}%'.format(login))).all()
+        if not projects:
+            return api_return_error(404, "User %s not found" % login)
     except Exception as e:
         db.session.rollback()
         logging.error(str(e))
