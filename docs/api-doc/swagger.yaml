@@ -5,12 +5,12 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "1.0.0"
+  version: "1.0.1"
   title: api.ramassage.epitech.eu
   description: |
     Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu
 
-host: api.ramassage.epitech.eu
+host: 127.0.0.1:8080
 basePath: /1.0
 paths:
   /user/:
@@ -292,7 +292,7 @@ paths:
           # Use JSON Schema format
           schema:
               $ref: "#/definitions/Template"
-        409:
+        404:
           description: "Template #{template_id} not found"
           schema:
               $ref: "#/definitions/Error"
@@ -579,7 +579,7 @@ paths:
     # This is a HTTP operation
     get:
       tags:
-        - template
+        - task
       # Describe this verb here. Note: you can use markdown
       description: |
         Récupérer les `Task` liées au Project correspondant à **project_id**.
@@ -616,7 +616,7 @@ paths:
         - project
       # Describe this verb here. Note: you can use markdown
       description: |
-        Récupérer les objets `Project`.
+        Récupérer les `Project` en cours (où la date de fin se situe au delà de maintenant).
       produces:
         - application/json
       security:
@@ -779,7 +779,7 @@ paths:
     # This is a HTTP operation
     get:
       tags:
-        - template
+        - project
       # Describe this verb here. Note: you can use markdown
       description: |
         Récupérer les `Project` liés au **slug**.
@@ -791,6 +791,40 @@ paths:
           description: Slug correspondant au Template
           required: true
           type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Project"
+        404:
+          description: "Template #{slug} not found"
+          schema:
+              $ref: "#/definitions/Error"
+  /project/template/{template_id}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les `Project` liés au **template_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: template_id
+          description: ID correspondant au Template
+          required: true
+          type: integer
       security:
         - api_signature: []
           
@@ -841,6 +875,124 @@ paths:
           description: "Project #{token} not found"
           schema:
               $ref: "#/definitions/Error"
+  /project/past:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les `Project` passés (où la date de fin se situe avant aujourd'hui).
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+  /project/all:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer tous les `Project`.
+      produces:
+        - application/json
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project" 
+  /project/user/{login}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer les `Project` courant de l'étudiant **login**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: login
+          description: Login de l'étudiant
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Project"
+        404:
+          description: "User #{login} not found"
+          schema:
+              $ref: "#/definitions/Error"
+  /project/all/user/{login}:
+    # This is a HTTP operation
+    get:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Récupérer tous les `Project` de l'étudiant **login**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: login
+          description: Login de l'étudiant
+          required: true
+          type: string
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              type: array
+              items:
+                $ref: "#/definitions/Project"
+        404:
+          description: "User #{login} not found"
+          schema:
+              $ref: "#/definitions/Error"
+
+ 
 
 securityDefinitions:
   api_signature:

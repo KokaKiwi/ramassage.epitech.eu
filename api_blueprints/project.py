@@ -167,6 +167,20 @@ def api_get_project_slug(slug):
     return jsonify({"projects": [p.serialize for p in projects]}), 200
 
 
+@project.route('/template/<int:_id>', methods=["GET"])
+@signed_auth()
+def api_get_project_by_template(_id):
+    from api import db, api_return_error
+    try:
+        projects = db.session.query(Project).join(Project.template).filter(Template.id==_id).all()
+        if not projects:
+            return api_return_error(404, "Template #%s not found" % _id)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"projects": [p.serialize for p in projects]}), 200
+
 @project.route('/user/<string:login>', methods=["GET"])
 @signed_auth()
 def api_get_project_current_student(login):

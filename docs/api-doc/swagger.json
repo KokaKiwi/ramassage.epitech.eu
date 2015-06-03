@@ -5,7 +5,7 @@
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
-    "host": "api.ramassage.epitech.eu",
+    "host": "127.0.0.1:8080",
     "basePath": "/1.0",
     "paths": {
         "/user/": {
@@ -738,7 +738,7 @@
         "/task/project/{project_id}": {
             "get": {
                 "tags": [
-                    "template"
+                    "task"
                 ],
                 "description": "Récupérer les `Task` liées au Project correspondant à **project_id**.\n",
                 "produces": [
@@ -995,7 +995,7 @@
         "/project/slug/{slug}": {
             "get": {
                 "tags": [
-                    "template"
+                    "project"
                 ],
                 "description": "Récupérer les `Project` liés au **slug**.\n",
                 "produces": [
@@ -1008,6 +1008,48 @@
                         "description": "Slug correspondant au Template",
                         "required": true,
                         "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Project"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Template #{slug} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/template/{template_id}": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer les `Project` liés au **template_id**.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "template_id",
+                        "description": "ID correspondant au Template",
+                        "required": true,
+                        "type": "integer"
                     }
                 ],
                 "security": [
