@@ -1,11 +1,13 @@
 __author__ = 'steven'
 
-from flask import request
+from flask import request, make_response
+from functools import wraps, update_wrapper
 from functools import wraps
 import config
 import hashlib
 import time
 import datetime
+
 import email.utils as eut
 import pytz
 import base64
@@ -29,6 +31,20 @@ def intranet_auth():
             return f(*args, **kwargs)
         return wrapped
     return wrapper
+
+
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        d = datetime.datetime.now(datetime.timezone.utc)
+        response.headers['Last-Modified'] = d.strftime("%a, %d %b %Y %H:%M:%S %Z")
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return update_wrapper(no_cache, view)
 
 
 def signed_auth():

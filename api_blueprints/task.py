@@ -9,11 +9,12 @@ from datetime import datetime
 
 task = Blueprint('task', __name__)
 
-from api_tools import signed_auth
+from api_tools import signed_auth, nocache
 
 
 @task.route('/', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_tasks():
     from api import db, api_return_error
     try:
@@ -52,6 +53,7 @@ def api_post_task():
 
 @task.route('/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_task(_id):
     from api import db, api_return_error
     try:
@@ -66,6 +68,7 @@ def api_get_task(_id):
 
 @task.route('/<string:slug>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_task_slug(slug):
     from api import db, api_return_error
     try:
@@ -80,6 +83,7 @@ def api_get_task_slug(slug):
 
 @task.route('/project/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_task_project(_id):
     from api import db, api_return_error
     try:

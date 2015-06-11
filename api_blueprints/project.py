@@ -9,11 +9,12 @@ from datetime import datetime
 
 project = Blueprint('project', __name__)
 
-from api_tools import signed_auth
+from api_tools import signed_auth, nocache
 
 
 @project.route('/', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_projects():
     from api import db, api_return_error
     try:
@@ -25,6 +26,7 @@ def api_get_projects():
 
 @project.route('/past', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_projects_past():
     from api import db, api_return_error
     try:
@@ -35,6 +37,7 @@ def api_get_projects_past():
 
 @project.route('/all', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_projects_all():
     from api import db, api_return_error
     try:
@@ -123,6 +126,7 @@ def api_post_project():
 
 @project.route('/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project(_id):
     from api import db, api_return_error
     try:
@@ -139,6 +143,7 @@ def api_get_project(_id):
 @project.route('/token/<string:token>', methods=["GET"])
 @project.route('/<string:token>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project_token(token):
     from api import db, api_return_error
     try:
@@ -154,6 +159,7 @@ def api_get_project_token(token):
 
 @project.route('/slug/<string:slug>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project_slug(slug):
     from api import db, api_return_error
     try:
@@ -169,6 +175,7 @@ def api_get_project_slug(slug):
 
 @project.route('/template/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project_by_template(_id):
     from api import db, api_return_error
     try:
@@ -183,6 +190,7 @@ def api_get_project_by_template(_id):
 
 @project.route('/user/<string:login>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project_current_student(login):
     from api import db, api_return_error
     try:
@@ -203,6 +211,7 @@ def api_get_project_current_student(login):
 
 @project.route('/all/user/<string:login>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_project_all_student(login):
     from api import db, api_return_error
     try:

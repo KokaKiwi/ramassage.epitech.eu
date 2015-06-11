@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import config
 
+from api_tools import nocache
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQL_DB_URI
@@ -32,6 +33,7 @@ app.register_blueprint(task, url_prefix='/1.0/task')
 app.register_blueprint(river, url_prefix='/1.0/river')
 
 @app.route('/', methods=["GET"])
+@nocache
 def api_get_root():
     return jsonify({})
 
