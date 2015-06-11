@@ -8,11 +8,12 @@ from models import Template
 
 template = Blueprint('template', __name__)
 
-from api_tools import signed_auth
+from api_tools import signed_auth,nocache
 
 
 @template.route('/', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_templates():
     from api import db, api_return_error
     try:
@@ -49,6 +50,7 @@ def api_post_template():
 
 @template.route('/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_template(_id):
     from api import db, api_return_error
     try:
@@ -65,6 +67,7 @@ def api_get_template(_id):
 @template.route('/<string:slug>', methods=["GET"])
 @template.route('/slug/<string:slug>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_template_slug(slug):
     from api import db, api_return_error
     try:

@@ -7,10 +7,11 @@ import logging
 
 user = Blueprint('user', __name__)
 
-from api_tools import signed_auth
+from api_tools import signed_auth, nocache
 
 @user.route('/', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_users():
     from api import db, api_return_error
     try:
@@ -41,6 +42,7 @@ def api_post_user():
 
 @user.route('/<int:_id>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_user(_id):
     from api import db, api_return_error
     try:
@@ -55,6 +57,7 @@ def api_get_user(_id):
 
 @user.route('/<string:login>', methods=["GET"])
 @signed_auth()
+@nocache
 def api_get_user_login(login):
     from api import db, api_return_error
     try:
