@@ -5,7 +5,7 @@
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
-    "host": "127.0.0.1:8080",
+    "host": "api.ramassage.epitech.eu",
     "basePath": "/1.0",
     "paths": {
         "/user/": {

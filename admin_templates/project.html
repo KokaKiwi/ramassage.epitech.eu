@@ -1,0 +1,105 @@
+{% extends 'admin/master.html' %}
+{% block head_tail %}
+  {{ super() }}
+  <link href="{{ url_for('static', filename='vis.min.css') }}" rel="stylesheet">
+  <script src="{{ url_for('static', filename='vis.min.js') }}"></script>
+{% endblock %}
+
+{% block brand %}
+    <h2 id="brand">[{{ project.city }}] {{ project.module_title }} / {{ project.title }}</h2>
+    {% endblock %}
+{% block body %}
+{{ super() }}
+<hr>
+<div class="row">
+    <p>Project #{{ project.id }}</p>
+    {% if logs|count > 0 %}
+    {% set success_pourcentage = (success / logs|count)*100 %}
+    <p>Stats : {{ success }} / {{ logs|count }} ({{ '%0.1f' % success_pourcentage|float }}% of success)</p>
+    {% endif %}
+    <p>Scolaryear : {{ project.scolaryear }}</p>
+    <p>Code instance : {{ project.instance_code }}</p>
+    <p>City : {{ project.city }}</p>
+    <p>Deadline : {{ project.deadline }}</p>
+    <p>Promo : {{ project.promo }}</p>
+    <p>Resp : {{ resp }}</p>
+    <p>Template Resp : {{ template_resp }}</p>
+    <p>Assistants : {{ assistants }}</p>
+    <p>Last Update : {{ project.last_update }}</p>
+    <p>Last Action : {{ project.last_action }}</p>
+    <p>datas sur le projet, timeline</p>
+    <a>corriger</a>
+    <a>ramasser maintenant</a>
+    <a>Planifier un ramassage/correction</a>
+    <a>Retour</a>
+</div>
+<div id="visualization"></div>
+
+<script type="text/javascript">
+  var container = document.getElementById('visualization');
+
+  var items = new vis.DataSet([
+  {% for t in project.tasks %}
+    {id: {{ t.id }}, content: '{{ t.launch_date }}<br/>{{ t.type }}, {{ t.status }}', start: '{{ t.launch_date.strftime('%Y-%m-%d') }}'},
+  {% endfor %}
+  ]);
+
+  var options = {};
+
+  var timeline = new vis.Timeline(container, items, options);
+</script>
+
+        <h3>Logs</h3>
+        <table class="table table-striped table-bordered table-hover model-list">
+            <thead>
+                <tr>
+                    <th class="column-header">
+                        Login
+                    </th>
+                    <th class="column-header">
+                        Status
+                    </th>
+                    <th class="column-header">
+                        Begin Date
+                    </th>
+                    <th class="column-header">
+                        End Date
+                    </th>
+                    <th class="column-header">
+                        Logs
+                    </th>
+                    <!--<th class="column-header">
+                        Groups
+                    </th>-->
+                </tr>
+            </thead>
+            {% for student in logs %}
+                <tr>
+                    <td>
+                        {{ student.user.login }}
+                    </td>
+                    <td>
+                        <span class="label {% if student.status == 'Succeed' %}label-success{% else %}label-danger{% endif %}">{{ student.status }}</span>
+                    </td>
+                    <td>
+                        {{ student.begin_date }}
+                    </td>
+                    <td>
+                        {{ student.end_date }}
+                    </td>
+                    <td>
+                        {{ student.logs }}
+                    </td>
+                </tr>
+            {% else %}
+            <tr>
+                <td colspan="999">
+                    <div class="text-center">
+                        No logs.
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+{% endblock body %}

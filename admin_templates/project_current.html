@@ -1,0 +1,76 @@
+{% extends 'admin/master.html' %}
+{% block body %}
+{{ super() }}
+<hr>
+<!--    <p>Hello World from MyView!  {{ _id }}</p>
+    <ul>
+        {% for template in current_templates %}
+            <li>{{ template }}</li>
+        {% endfor %}
+    </ul>-->
+
+        <table class="table table-striped table-bordered table-hover model-list">
+            <thead>
+                <tr>
+                    <th class="col-md-1">&nbsp;</th>
+                    <th class="column-header">
+                        Code Module / Slug
+                    </th>
+                    <th class="column-header">
+                        Project
+                    </th>
+                    <th class="column-header">
+                        Module
+                    </th>
+                    <th class="column-header">
+                        Deadline
+                    </th>
+                    <th class="column-header">
+                        Cities
+                    </th>
+
+                    <!--<th class="column-header">
+                        Groups
+                    </th>-->
+                </tr>
+            </thead>
+            {% for template in current_templates %}
+            <tr>
+                <td>
+                    <a href="?template_id={{ template.id }}" role="button" class="btn btn-default" aria-label="More infos">
+                      Show
+                    </a>
+                    <!-- <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>  -->
+                </td>
+
+                <td>
+                    {{ template["slug"] }}
+                </td>
+                <td>
+                    {{ template["project"] }}
+                </td>
+                <td>
+                    {{ template["module"] }}
+                </td>
+                <td>
+                    {{ template["deadline"] }}
+                </td>
+                <td>
+                    {{ template["cities"] }}
+                </td>
+                <!--<td>
+                    {{ template["groups"] }}
+                </td>-->
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="999">
+                    <div class="text-center">
+                        No project.
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+{% endblock body %}
