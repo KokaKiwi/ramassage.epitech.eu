@@ -40,7 +40,7 @@
 
   var items = new vis.DataSet([
   {% for t in project.tasks %}
-    {id: {{ t.id }}, content: '{{ t.launch_date }}<br/>{{ t.type }}, {{ t.status }}', start: '{{ t.launch_date.strftime('%Y-%m-%d') }}'},
+    {id: {{ t.id }}, content: '{{ t.launch_date }}<br/>{{ t.type }}, {{ t.status }}', start: '{{ t.launch_date }}'},
   {% endfor %}
   ]);
 
