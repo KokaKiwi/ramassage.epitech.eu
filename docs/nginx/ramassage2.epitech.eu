@@ -29,6 +29,9 @@ server {
             proxy_pass   http://api_admin;
         }
 
+        location /static {
+	    root /home/ramassage/ramassage.epitech.eu/;
+        }
 
 	location ~ ^/~(.+?)(/.*)?$ {
 		  alias /work/jail/users/$1/$2;
