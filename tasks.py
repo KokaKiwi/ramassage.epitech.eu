@@ -63,6 +63,11 @@ def scheduled_launch(task_id, token):
         session.close()
     return False
 
+# judge
+#  if task.project.judge:
+#    j = Judge(...)
+#    j.run()
+
 @app.task
 def scheduled_launch_done(task_id):
     session = Session()

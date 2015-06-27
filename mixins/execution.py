@@ -26,3 +26,20 @@ class ExecMixin(object):
             return ExecResult(proc.returncode, outs, errs, e)
         return ExecResult(proc.returncode, outs, errs)
 
+    # Auth by key only
+    def _safe_remote_exec(self, remote, command, timeout=15, cwd=None):
+        if isinstance(command, str):
+            command = shlex.split(command)
+        if cwd:
+            command.insert(0, ";")
+            command.insert(0, cwd)
+            command.insert(0, "cd")
+        c = ["ssh", "-o", "PasswordAuthentication=False", "-o", "StrictHostKeyChecking=no", remote, " ".join(command)]
+        proc = subprocess.Popen(c, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            outs, errs = proc.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired as e:
+            proc.kill()
+            outs, errs = proc.communicate()
+            return ExecResult(proc.returncode, outs, errs, e)
+        return ExecResult(proc.returncode, outs, errs)
