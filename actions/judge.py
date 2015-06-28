@@ -78,21 +78,22 @@ class CPoolDriver(FsMixin, ExecMixin):
                                cwd="~/tmp/%s" % self._project["id"])
         if res.return_code != 0:
             raise Exception("unable to move pickups")
-        # convert rendu
-        # clear dest
-        # mv
-        # clean remote directory (login lists + tarball + extracted dir)
 
     def execute(self):
-        #TODO: gestion d'un format pour l'action à effectuer : comme list login
         judge = self._project["template"]["judge_uri"]
         if not judge:
             raise Exception("No judge defined")
+        datas = {"simple_list": self._simple_list_name,
+                 "full_list": self._full_list_name,
+                 }
+        datas.update(self._project["template"])
+        datas.update(self._project)
         t = self._task["type"] if self._task and "type" in self._task else "preliminary"
         prelim = self._project["template"]["judge_preliminary_exec"]
         action = self._project["template"]["judge_final_exec"] if t == "auto" or not prelim else prelim
         if not action or len(action) == 0:
             raise Exception("No action to exec")
+        action = action % datas
         r = self._safe_remote_exec(judge, action, timeout=180)
         logging.warning("CPoolDriver::execute %s" % r.outs)
         logging.warning("CPoolDriver::execute %s" % r.errs)
@@ -157,7 +158,7 @@ class Judge(object):
             self._on_error("prepare", e)
 
 
-def main():
+def manual(project, task_id=None):
     import config
     from sqlalchemy.orm import sessionmaker
     from sqlalchemy import create_engine
@@ -166,8 +167,8 @@ def main():
     Session.configure(bind=engine)
     from models import Project, Task
     session = Session()
-    obj = session.query(Project).get(1)
-    t = session.query(Task).get(1)
+    obj = session.query(Project).get(project)
+    t = session.query(Task).get(task_id) if task_id else None
 
-    j = Judge(obj.serialize, t.serialize)
+    j = Judge(obj.serialize, t.serialize if task_id else None)
     j.run()
