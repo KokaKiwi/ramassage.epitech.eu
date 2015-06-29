@@ -34,7 +34,7 @@ class ExecMixin(object):
             command.insert(0, ";")
             command.insert(0, cwd)
             command.insert(0, "cd")
-        c = ["ssh", "-o", "PasswordAuthentication=False", "-o", "StrictHostKeyChecking=no", remote, " ".join(command)]
+        c = ["ssh", "-o", "PasswordAuthentication=no", "-o", "StrictHostKeyChecking=no", remote, " ".join(command)]
         proc = subprocess.Popen(c, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
             outs, errs = proc.communicate(timeout=timeout)
