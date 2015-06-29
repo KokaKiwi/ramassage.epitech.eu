@@ -76,7 +76,7 @@ class CPoolDriver(FsMixin, ExecMixin):
         if res.return_code != 0:
             raise Exception("unable to extract tarball")
         self._safe_remote_exec(judge, "for i in `ls`; do rm -rf ~/rendus/$i/%s; mkdir -p ~/rendus/$i/; " % (self._project["template"]["repository_name"]) +
-                               "mv $i ~/repos/$i/%s ; done" % (self._project["template"]["repository_name"]),
+                               "mv $i ~/rendus/$i/%s ; done" % (self._project["template"]["repository_name"]),
                                cwd="~/tmp/%s" % self._project["id"])
         if res.return_code != 0:
             raise Exception("unable to move pickups")
