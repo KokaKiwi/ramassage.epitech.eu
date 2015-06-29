@@ -71,6 +71,8 @@ class CPoolDriver(FsMixin, ExecMixin):
                         cwd=self._work_dir, timeout=120)
         res = self._safe_remote_exec(judge, "unzip '%s'" % (base_arch.replace(' ', '\\ ')), cwd="~/tmp/%s" % self._project["id"], timeout=120)
         self._safe_remote_exec(judge, "rm -f '%s'" % (base_arch.replace(' ', '\\ ')), cwd="~/tmp/%s" % self._project["id"])
+        logging.warning("CPoolDriver::unzip %s" % res.outs)
+        logging.warning("CPoolDriver::unzip %s" % res.errs)
         if res.return_code != 0:
             raise Exception("unable to extract tarball")
         self._safe_remote_exec(judge, "for i in `ls`; do rm -rf ~/rendus/$i/%s; mkdir -p ~/rendus/$i/; " % (self._project["template"]["repository_name"]) +
