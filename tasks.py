@@ -1,6 +1,7 @@
 from celery import Celery
 from actions.fetch import Fetch
 from actions.pickup import Pickup
+from actions.judge import Judge
 from celery.bin.celery import result
 from celery.result import AsyncResult
 from sqlalchemy import create_engine
@@ -45,7 +46,6 @@ def pickup_task(task_id):
         session.close()
 
 
-
 @app.task
 def scheduled_launch(task_id, token):
     session = Session()
@@ -54,7 +54,7 @@ def scheduled_launch(task_id, token):
         obj.status = "ongoing"
         session.add(obj)
         session.commit()
-        chain(fetch.si(token), pickup_task.si(task_id), scheduled_launch_done.si(task_id))()
+        chain(fetch.si(token), pickup_task.si(task_id), scheduled_judge.si(task_id), scheduled_launch_done.si(task_id))()
         return True
     except Exception as e:
         logging.warning(e)
@@ -63,10 +63,25 @@ def scheduled_launch(task_id, token):
         session.close()
     return False
 
-# judge
-#  if task.project.judge:
-#    j = Judge(...)
-#    j.run()
+
+@app.task
+def scheduled_judge(task_id):
+    session = Session()
+    try:
+        task = session.query(Task).get(task_id)
+        if not task:
+            raise Exception("This task does not exist.")
+        project = task.project.serialize
+        stask = task.serialize
+        if task.project.template.call_judge:
+            logging.warning("Time to call Judge!")
+            j = Judge(project, stask)
+            j.run()
+    except Exception as e:
+        logging.warning(e)
+    finally:
+        session.close()
+    return True
 
 @app.task
 def scheduled_launch_done(task_id):

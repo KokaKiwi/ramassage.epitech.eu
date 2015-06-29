@@ -93,6 +93,7 @@ class CPoolDriver(FsMixin, ExecMixin):
         t = self._task["type"] if self._task and "type" in self._task else "preliminary"
         prelim = self._project["template"]["judge_preliminary_exec"]
         action = self._project["template"]["judge_final_exec"] if t == "auto" or not prelim else prelim
+        # TOOD: or task.exec_cmd
         if not action or len(action) == 0:
             raise Exception("No action to exec")
         action = action % datas
