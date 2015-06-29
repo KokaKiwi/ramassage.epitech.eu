@@ -65,12 +65,12 @@ class CPoolDriver(FsMixin, ExecMixin):
             raise Exception("Unable to connect to remote judge")
         self._safe_remote_exec(judge, "rm -rf tmp/%s; mkdir -p tmp/%s" % (self._project["id"], self._project["id"]))
         #self._safe_remote_exec(judge, "echo %s; mkdir -p tmp/%s" % (self._project["id"], self._project["id"]))
-        self._safe_exec("scp %s %s:~/logins/" % (self._simple_list_name, judge), cwd=self._work_dir)
-        self._safe_exec("scp %s %s:~/logins/" % (self._full_list_name, judge), cwd=self._work_dir)
-        self._safe_exec("scp %s %s:~/tmp/%s" % (archive_name, judge, self._project["id"]),
+        self._safe_exec("scp '%s' %s:~/logins/" % (self._simple_list_name, judge), cwd=self._work_dir)
+        self._safe_exec("scp '%s' %s:~/logins/" % (self._full_list_name, judge), cwd=self._work_dir)
+        self._safe_exec("scp '%s' %s:~/tmp/%s" % (archive_name, judge, self._project["id"]),
                         cwd=self._work_dir, timeout=120)
-        res = self._safe_remote_exec(judge, "unzip %s" % (base_arch), cwd="~/tmp/%s" % self._project["id"], timeout=120)
-        self._safe_remote_exec(judge, "rm -f %s" % (base_arch), cwd="~/tmp/%s" % self._project["id"])
+        res = self._safe_remote_exec(judge, "unzip '%s'" % (base_arch), cwd="~/tmp/%s" % self._project["id"], timeout=120)
+        self._safe_remote_exec(judge, "rm -f '%s'" % (base_arch), cwd="~/tmp/%s" % self._project["id"])
         if res.return_code != 0:
             raise Exception("unable to extract tarball")
         self._safe_remote_exec(judge, "for i in `ls`; do rm -rf ~/repos/$i/%s; mkdir -p ~/repos/$i/; " % (self._project["template"]["repository_name"]) +
