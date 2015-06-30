@@ -56,7 +56,7 @@ def scheduled_launch(task_id, token):
         obj.status = "ongoing"
         session.add(obj)
         session.commit()
-        chain(fetch.si(token), pickup_task.si(task_id), scheduled_judge.si(task_id), scheduled_launch_done.si(task_id))()
+        chain(fetch.si(token), pickup_task.si(task_id), scheduled_launch_done.si(task_id))()
         return True
     except Exception as e:
         logging.warning(e)
@@ -108,6 +108,7 @@ def pickup_complete(repos, task_id, project):
     p.archive()
     p.distribute()
     p.clean_all()
+    scheduled_judge(task_id)
     return None
 
 
