@@ -38,8 +38,10 @@ def pickup_task(task_id):
         if not task:
             raise Exception("This task does not exist.")
         project = task.project.serialize
+        #return chord((retrieve_scm.s(task_id, project, u["user"]["login"]) for u in project["students"]),
+        #      pickup_complete.s(task_id, project)).apply_async()
         return chord((retrieve_scm.s(task_id, project, u["user"]["login"]) for u in project["students"]),
-              pickup_complete.s(task_id, project)).apply_async()
+              pickup_complete.s(task_id, project))()
     except IntegrityError:
             session.rollback()
     finally:
