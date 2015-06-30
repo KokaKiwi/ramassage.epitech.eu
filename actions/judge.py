@@ -55,7 +55,7 @@ class CPoolDriver(FsMixin, ExecMixin):
         archive_name = os.path.join(config.ARCHIVE_DIR, arch)
         archive_name = self._last_version("%s.zip" % (archive_name), with_extension=True)
         base_arch = os.path.basename(archive_name)
-        print("archive_name: %s" % (base_arch))
+        logging.warning("archive_name: %s" % (base_arch))
         # find latest tarball
         judge = self._project["template"]["judge_uri"]
         if not judge:
