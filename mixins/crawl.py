@@ -35,7 +35,6 @@ class CrawlerMixin(object):
     def _raw_post(self, url, datas=None, content_type="application/x-www-form-urlencoded",
                   response_type="application/json", headers={}, safe=False, verify=True):
         try:
-            return 42, ""
             headers['content-type'] = content_type
             obj = requests.post(url, data=datas, headers=headers, verify=verify)
             if response_type == "application/json":
