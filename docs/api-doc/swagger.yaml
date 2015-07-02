@@ -809,6 +809,7 @@ paths:
           description: "Template #{slug} not found"
           schema:
               $ref: "#/definitions/Error"
+              
   /project/template/{template_id}:
     # This is a HTTP operation
     get:
@@ -992,7 +993,46 @@ paths:
           schema:
               $ref: "#/definitions/Error"
 
- 
+  /project/{project_id}/notes:
+    # This is a HTTP operation
+    post:
+      tags:
+        - project
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Upload des notes pour l'objet `Project` correspondant au **project_id**.
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: project_id
+          description: ID du Project
+          required: true
+          type: string
+        - in: body
+          name: body
+          description: "notes en tant qu'object json ou bien en tant que csv avec header (mini: login:note;comment)"
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Notes"
+      security:
+        - api_signature: []
+          
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          # A schema describing your response object.
+          # Use JSON Schema format
+          schema:
+              $ref: "#/definitions/Project"
+        404:
+          description: "Project #{project_id} not found"
+          schema:
+              $ref: "#/definitions/Error"
 
 securityDefinitions:
   api_signature:
@@ -1027,6 +1067,14 @@ definitions:
       lastname:
         type: string
       login: 
+        type: string
+  Notes:
+    properties:
+      login: 
+        type: string
+      note:
+        type: string
+      comment:
         type: string
   Template:
     properties:

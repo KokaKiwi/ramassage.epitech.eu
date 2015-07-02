@@ -1252,6 +1252,57 @@
                     }
                 }
             }
+        },
+        "/project/{project_id}/notes": {
+            "post": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Upload des notes pour l'objet `Project` correspondant au **project_id**.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "project_id",
+                        "description": "ID du Project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "notes en tant qu'object json ou bien en tant que csv avec header (mini: login:note;comment)",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Notes"
+                            }
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/Project"
+                        }
+                    },
+                    "404": {
+                        "description": "Project #{project_id} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -1299,6 +1350,19 @@
                     "type": "string"
                 },
                 "login": {
+                    "type": "string"
+                }
+            }
+        },
+        "Notes": {
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "comment": {
                     "type": "string"
                 }
             }
