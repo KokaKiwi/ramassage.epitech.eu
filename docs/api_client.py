@@ -46,17 +46,20 @@ class Client(object):
             f.write(response.read(65 * 1024))
         return {"file": url}
 
-    def _req(self, method, url, datas=None):
+    def _req(self, method, url, datas=None, data_type="application/json"):
         conn = httplib.HTTPConnection(self._host)
         #headers = {"Content-type": "application/x-www-form-urlencoded"}
         headers = {"Content-type": "application/json"}
         d = datetime.datetime.now(pytz.timezone('Europe/Paris'))
         headers["Date"] = d.strftime('%a, %d %b %Y %H:%M:%S %z')
         print("Date: %s" % headers["Date"])
-        headers["Authorization"] = self._sign(d, method, url, json.dumps(datas).encode("utf-8"))
+        headers["Authorization"] = self._sign(d, method, url, json.dumps(datas).encode("utf-8") if data_type == "application/json" else datas.encode("utf-8"))
         print("Authorization: %s" % headers["Authorization"])
         #conn.request(method, url, urllib.urlencode(datas) if datas else None, headers=headers)
-        conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else json.dumps(datas).encode("utf-8"), headers=headers)
+        if data_type == "application/json":
+            conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else json.dumps(datas).encode("utf-8"), headers=headers)
+        else:
+            conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else datas.encode("utf-8"), headers=headers)
         conn.set_debuglevel(1)
         response = conn.getresponse()
         content_type = response.getheader("Content-Type")
@@ -85,11 +88,22 @@ class Client(object):
         res = requests.put("http://" + self._machine + url, files={"file": (os.path.basename(f), open(f, 'rb'))}, headers=headers)
         print(res.text)
 
+    def post_notes(self, url, filename):
+        raw_datas = ""
+        with open(filename, "r") as f:
+            raw_datas = f.readlines()
+        print(raw_datas)
+        return self._req("POST", url, "".join(raw_datas), "text/csv")
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) == 1:
         print("USAGE python3 %s /1.0/..." % (sys.argv[0]))
         sys.exit(1)
     g = Client(config.URI)
-    print(str(g.get(sys.argv[1])))
+    if "notes" in sys.argv[1]:
+        r = g.post_notes(sys.argv[1], sys.argv[2])
+        print(str(r))
+    else:
+        print(str(g.get(sys.argv[1])))
     #print(str(g.post("/1.0/user/", {"login": "couval_j", "firstname": "Jean-Baptiste", "lastname": "COUVAL"})))
