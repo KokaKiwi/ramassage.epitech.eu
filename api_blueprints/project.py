@@ -388,7 +388,7 @@ def api_patch_project(_id):
 
 
 @project.route('/<int:_id>/notes', methods=["POST"])
-#@signed_auth()
+@signed_auth()
 def api_post_project_notes(_id):
     from api import db, api_return_error
     import io
