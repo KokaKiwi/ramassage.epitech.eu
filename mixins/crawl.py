@@ -35,6 +35,7 @@ class CrawlerMixin(object):
     def _raw_post(self, url, datas=None, content_type="application/x-www-form-urlencoded",
                   response_type="application/json", headers={}, safe=False, verify=True):
         try:
+            return 42, ""
             headers['content-type'] = content_type
             obj = requests.post(url, data=datas, headers=headers, verify=verify)
             if response_type == "application/json":
@@ -57,8 +58,27 @@ class CrawlerMixin(object):
             return None
         return data
 
-    def _post(self):
-        raise NotImplemented()
+    def _post_notes(self, token, notes):
+        up = {}
+        for values in notes:
+            key = values["login"]
+            up["notes[%s][note]" % key] = values["note"]
+            up["notes[%s][commentaire]" % key] = values["comment"]
+            if len(up) >= 100:
+                self._post("/upload", token, up)
+                up = {}
+        if len(up) > 0:
+            self._post("/upload", token, up)
+
+    def _post(self, a, token, datas):
+        logging.warning("CrawlerMixin::_post action(%s), token(%s), datas(%s)" % (a, token, datas))
+        sign = hashlib.sha1("{0}-{1}".format(token, config.CRAWLER_SALT).encode("utf-8")).hexdigest()
+        url = config.CRAWLER_URL % {"action": a, "token": token, "sign": sign}
+        status_code, data = self._raw_post(url, datas, response_type="application/bigintjson", safe=True, verify=False)
+        if status_code != 200:
+            logging.warning("CrawlerMixin::_post action(%s), token(%s) : %s - %s" % (a, token, status_code, data))
+            return None
+        return data
 
     def _inform(self, url, task, optional=None):
         datas = {

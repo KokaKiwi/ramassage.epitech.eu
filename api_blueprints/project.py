@@ -384,3 +384,53 @@ def api_patch_project(_id):
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
     return jsonify(t.serialize), 200
+
+
+
+@project.route('/<int:_id>/notes', methods=["POST"])
+#@signed_auth()
+def api_post_project_notes(_id):
+    from api import db, api_return_error
+    import io
+    import csv
+    from mixins.crawl import CrawlerMixin
+    rows = {}
+    try:
+        datas = request.get_data().decode("utf-8")
+        try:
+            json.loads(datas)
+        except:
+            f = io.StringIO(datas)
+            hdr = []
+            reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
+            for row in reader:
+                line = {}
+                if len(hdr) == 0:
+                    hdr = row
+                else:
+                    i = 0
+                    for elem in row:
+                        line[hdr[i]] = elem
+                        i += 1
+                    rows[line[hdr[0]]] = line
+        t = db.session.query(Project).get(_id)
+        if not t:
+            return api_return_error(404, "Project %s not found" % _id)
+        out = []
+        for sp in t.students:
+            if sp.user.login in rows:
+                out.append(rows[sp.user.login])
+
+        crawl = CrawlerMixin()
+        crawl._post_notes(t.token, out)
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        return api_return_error(409, "Conflict", str(e))
+    except KeyError as e:
+        return api_return_error(400, "Bad Request", "Field %s is missing" % str(e))
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"rows": out}), 200
