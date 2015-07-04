@@ -38,8 +38,6 @@ class Controller(object):
             data = datas.decode("utf-8") if datas else ""
         else:
             data = url
-        print("data: %s" % "{0}-{1}".format(str(int(time.mktime(d.timetuple()))),
-            data).encode("utf-8"))
         hm = hmac.new(self._config["HASH"].encode("utf-8"), "{0}-{1}".format(str(int(time.mktime(d.timetuple()))),
             data).encode("utf-8"), hashlib.sha256)
 
@@ -58,16 +56,14 @@ class Controller(object):
         headers = {"Content-type": "application/json"}
         d = datetime.datetime.now(pytz.timezone('Europe/Paris'))
         headers["Date"] = d.strftime('%a, %d %b %Y %H:%M:%S %z')
-        print("Date: %s" % headers["Date"])
         headers["Authorization"] = self._sign(d, method, url,
                                               json.dumps(datas).encode("utf-8") if data_type == "application/json"
                                               else datas.encode("utf-8"))
-        print("Authorization: %s" % headers["Authorization"])
         if data_type == "application/json":
             conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else json.dumps(datas).encode("utf-8"), headers=headers)
         else:
             conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else datas.encode("utf-8"), headers=headers)
-        conn.set_debuglevel(1)
+        #conn.set_debuglevel(1)
         response = conn.getresponse()
         content_type = response.getheader("Content-Type")
         if response.status > 201:
@@ -106,7 +102,11 @@ class Controller(object):
 
     def searchAction(self, slug, *args):
         """Find project(s) by slug"""
-        print(self._get("/1.0/project/slug/%s" % slug))
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        print("%s project(s) found:\n" % len(projects))
+        for p in projects:
+            print(self._beautify_project(p))
         return True
 
     def projectAction(self, uid, *args):
@@ -117,15 +117,33 @@ class Controller(object):
         return True
 
     def _beautify_project(self, obj):
-        return """Project #%(id)s
+        for k, v in obj["template"].items():
+            obj["template.%s" % k] = v
+        obj["assistants_join"] = ", ".join(["%s %s" % (u["firstname"], u["lastname"]) for u in obj["assistants"]])
+        obj["responsables_join"] = ", ".join(["%s %s" % (u["firstname"], u["lastname"]) for u in obj["resp"]])
+        obj["templates_resp_join"] = ", ".join(["%s %s" % (u["firstname"],
+                                                           u["lastname"]) for u in obj["template_resp"]])
+        students = obj["students"]
+        nb_succeed = 0
+        for s in students:
+            if s["status"] == "Succeed":
+                nb_succeed += 1
+        obj["stats_students"] = "%s (%.2f%%, %s/%s picked up)" % (len(students), (nb_succeed / len(students)) * 100,
+                                                                 nb_succeed, len(students)) \
+            if nb_succeed > 0 else "%s" % (len(students))
+        #obj.update(obj["template"] if "template" in obj else {})
+        # - Template resp: %(templates_resp_join)s
+        return """%(title)s - %(city)s (#%(id)s) :
     - Scolaryear: %(scolaryear)s
-    - City: %(scolaryear)s
-    - Deadline: %(scolaryear)s
+    - City: %(city)s
+    - Deadline: %(deadline)s
     - Module: %(module_title)s (%(module_code)s)
-    - Title: %(scolaryear)s
     - Instance: %(instance_code)s
-    - Promo: %(scolaryear)s
-    - Slug: %(scolaryear)s
+    - Slug: %(template.slug)s
+    - Repository: %(template.repository_name)s
+    - Assistants: %(assistants_join)s
+    - Resp: %(responsables_join)s
+    - Students stats: %(stats_students)s
 """ % (obj)
 
     """
