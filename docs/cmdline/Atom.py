@@ -26,8 +26,8 @@ VERSION = "0.1 beta"
 
 
 class Controller(object):
-    def __init__(self, options):
-        self._options = options
+    def __init__(self):
+        self._options = {}
         self._config = {}
         self._config["URI"] = "127.0.0.1:8080"
         self._config["UUID"] = "93330b53-d676-4e38-a275-4b147798366c"
@@ -59,9 +59,10 @@ class Controller(object):
         d = datetime.datetime.now(pytz.timezone('Europe/Paris'))
         headers["Date"] = d.strftime('%a, %d %b %Y %H:%M:%S %z')
         print("Date: %s" % headers["Date"])
-        headers["Authorization"] = self._sign(d, method, url, json.dumps(datas).encode("utf-8") if data_type == "application/json" else datas.encode("utf-8"))
+        headers["Authorization"] = self._sign(d, method, url,
+                                              json.dumps(datas).encode("utf-8") if data_type == "application/json"
+                                              else datas.encode("utf-8"))
         print("Authorization: %s" % headers["Authorization"])
-        #conn.request(method, url, urllib.urlencode(datas) if datas else None, headers=headers)
         if data_type == "application/json":
             conn.request(method, url, urllib.parse.urlencode(datas) if datas and method == "GET" else json.dumps(datas).encode("utf-8"), headers=headers)
         else:
@@ -69,7 +70,8 @@ class Controller(object):
         conn.set_debuglevel(1)
         response = conn.getresponse()
         content_type = response.getheader("Content-Type")
-        print('%s: %s %s' % (url, response.status, response.reason))
+        if response.status > 201:
+            print('%s: %s %s' % (url, response.status, response.reason))
         try:
             if content_type.find("zip") >= 0:
                 return self._storeFile(url, response)
@@ -103,49 +105,88 @@ class Controller(object):
         return self._req("POST", url, "".join(raw_datas), "text/csv")
 
     def searchAction(self, slug, *args):
+        """Find project(s) by slug"""
         print(self._get("/1.0/project/slug/%s" % slug))
         return True
 
+    def projectAction(self, uid, *args):
+        """Show project information"""
+        res = self._get("/1.0/project/%s" % uid)
+        print(res)
+        print(self._beautify_project(res))
+        return True
 
+    def _beautify_project(self, obj):
+        return """Project #%(id)s
+    - Scolaryear: %(scolaryear)s
+    - City: %(scolaryear)s
+    - Deadline: %(scolaryear)s
+    - Module: %(module_title)s (%(module_code)s)
+    - Title: %(scolaryear)s
+    - Instance: %(instance_code)s
+    - Promo: %(scolaryear)s
+    - Slug: %(scolaryear)s
+""" % (obj)
 
-    def execute(self, args):
+    """
+        Actions interessantes :
+            o Programmer un ramassage : soit maintenant, soit à une date precise, pour une seule ville ou plusieurs
+             => soit avec l'id du projet, ou le slug, ou le nom ?
+            o uploader des notes : soit avec un slug +/- ville(s), soit avec l'id
+            o stats sur un ramassage (slug + ville, ou id)
+            o recuperer adresses emails pour un projet
+            o infos sur un template
+            o infos sur un module ?
+            o recuperer les projets d'un utilisateur
+    """
+
+    @property
+    def usage(self):
+        ret = "usage: %prog [options] command [params...]\n"
+        ret += "Command(s) available:\n"
+        for function_name, fn in inspect.getmembers(self.__class__, predicate=inspect.isfunction):
+            #print("function_name(%s) : fn(%s)" % (function_name, fn))
+            if function_name.endswith("Action"):
+                ret += "\to %s [%s]\n\t\t%s\n" % (function_name.replace("Action", ""),
+                                                ", ".join(inspect.getargspec(fn).args[1:]),
+                                                fn.__doc__ if fn.__doc__ else "")
+        return ret
+
+    def _execute(self, args):
         cmd = args[0]
         method = "%sAction" % (cmd.lower())
         try:
             for function_name, fn in inspect.getmembers(self.__class__, predicate=inspect.isfunction):
-                #print("function_name(%s) : fn(%s)" % (function_name, fn))
                 if method == function_name:
                     result = fn(self, *args[1:])
                     if result == False:
                         sys.exit(1)
+                    return True
         except Exception as e:
             print(str(e))
-        sys.stderr.write("%s: Command not found" % cmd)
-        #try:
-        #    pass
-        #
-        #except Exception as e:
-        #    pass
+            return True
+        sys.stderr.write("%s: Command not found\n\n" % cmd)
+        return False
 
+    def execute(self):
+        parser = OptionParser(self.usage, version=VERSION)
+        parser.add_option("-c", "--config", dest="filename",
+                          help="using a specific config file FILE", metavar="FILE")
+        parser.add_option("-j", "--json",
+                          action="store_true", dest="json",
+                          help="display output as json", default=False)
+        parser.add_option("-q", "--quiet",
+                          action="store_false", dest="verbose", default=True,
+                          help="don't print status messages to stdout")
 
+        (self._options, args) = parser.parse_args()
+        if len(args) == 0:
+            return parser.print_usage()
+        print("options: %s" % str(self._options))
+        print("args: %s" % str(args))
+        if not self._execute(args):
+            sys.stderr.write(parser.get_usage())
 
-
-
-def main():
-    usage = "usage: %prog [options] command [params...]"
-    parser = OptionParser(usage, version=VERSION)
-    parser.add_option("-f", "--file", dest="filename",
-                      help="write report to FILE", metavar="FILE")
-    parser.add_option("-q", "--quiet",
-                      action="store_false", dest="verbose", default=True,
-                      help="don't print status messages to stdout")
-
-    (options, args) = parser.parse_args()
-    if len(args) == 0:
-        return parser.print_usage()
-    print("options: %s" % str(options))
-    print("args: %s" % str(args))
-    Controller(options).execute(args)
 
 if __name__ == "__main__":
-    main()
+    Controller().execute()
