@@ -164,7 +164,9 @@ class CrawlerMixin(object):
             result["instance_code"] = base["codeinstance"]
         if "module_title" in base:
             result["module_title"] = base["module_title"]
-        if "title" in base:
+        if "project_title" in base:
+            result["title"] = base["project_title"]
+        if "title" in base and len(base["title"]) > 0:
             result["title"] = base["title"]
         return result
 

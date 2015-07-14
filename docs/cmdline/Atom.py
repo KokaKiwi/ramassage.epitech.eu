@@ -6,12 +6,10 @@ try:
 except:
     import http.client as httplib
 
-from optparse import OptionParser
+from optparse import OptionParser, OptionValueError
 import inspect
 import json
-import requests
 import time
-import logging
 import hashlib
 import hmac
 import base64
@@ -105,8 +103,11 @@ class Controller(object):
         res = self._get("/1.0/project/slug/%s" % slug)
         projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
         print("%s project(s) found:\n" % len(projects))
+        city = self._options.city
         for p in projects:
-            print(self._beautify_project(p))
+            if not city or city == p["city"]:
+                #if self._confirm("Displaying %s" % city):
+                print(self._beautify_project(p))
         return True
 
     def projectAction(self, uid, *args):
@@ -114,6 +115,24 @@ class Controller(object):
         res = self._get("/1.0/project/%s" % uid)
         print(res)
         print(self._beautify_project(res))
+        return True
+
+    def pickupAction(self, slug, date=None):
+        """Schedule a pickup"""
+        _date = datetime.datetime.now()
+        if date:
+            #parsedatetime ?
+            _date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        print("%s project(s) found:\n" % len(projects))
+        if len(projects) == 0:
+            return False
+        for p in projects:
+            if not self._options.city or self._options.city == p["city"]:
+                print(self._beautify_project(p))
+                if self._confirm("Picking up %s %s." % (p["city"], "Now" if not date else "at %s" % _date.strftime("%Y-%m-%d %H:%M:%S"))):
+                    print("POST /pickup/ : %s, %s" % (p["id"], _date.strftime('%Y-%m-%d %H:%M:%S')))
         return True
 
     def _beautify_project(self, obj):
@@ -186,16 +205,43 @@ class Controller(object):
         sys.stderr.write("%s: Command not found\n\n" % cmd)
         return False
 
+    def _confirm(self, question=None):
+        if self._options.yes:
+            return True
+        if question:
+            print(question)
+        flag = True
+        while flag:
+            msg = input("Do you confirm this action (yes/no) ? ")
+            if msg == "yes" or msg == "y":
+                return True
+            if msg == "no" or msg == "n":
+                return False
+        return False
+
     def execute(self):
+        def option_city(option, opt_str, value, parser):
+            if value not in ("BDX", "LIL", "LYN", "MAR", "MPL", "NAN",
+                             "NCE", "NCY", "PAR", "REN", "STG", "TLS"):
+                raise OptionValueError("Unknown city: %s" % value)
+            setattr(parser.values, option.dest, value)
+
         parser = OptionParser(self.usage, version=VERSION)
         parser.add_option("-c", "--config", dest="filename",
                           help="using a specific config file FILE", metavar="FILE")
         parser.add_option("-j", "--json",
                           action="store_true", dest="json",
                           help="display output as json", default=False)
+        parser.add_option("-y", "--yes",
+                          action="store_true", dest="yes",
+                          help="Assume Yes to all queries and do not prompt", default=False)
         parser.add_option("-q", "--quiet",
                           action="store_false", dest="verbose", default=True,
                           help="don't print status messages to stdout")
+        parser.add_option("-C", "--city", dest="city", action="callback",
+                          type="str", nargs=1,
+                          help="restrict actions to a specific city", default=None,
+                          callback=option_city)
 
         (self._options, args) = parser.parse_args()
         if len(args) == 0:
