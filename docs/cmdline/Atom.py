@@ -117,6 +117,19 @@ class Controller(object):
         print(self._beautify_project(res))
         return True
 
+    def statsAction(self, slug):
+        """Display pickup's statistics"""
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        for p in projects:
+            if not self._options.city or self._options.city == p["city"]:
+                #if self._confirm("Displaying %s" % city):
+                print("%s: " % p["city"])
+                for s in p["students"]:
+                    print("%s: %s - %s" % (s["user"]["login"], s["status"], s["logs"]))
+                print("")
+        return True
+
     def pickupAction(self, slug, date=None):
         """Schedule a pickup"""
         _date = datetime.datetime.now()
@@ -132,7 +145,8 @@ class Controller(object):
             if not self._options.city or self._options.city == p["city"]:
                 print(self._beautify_project(p))
                 if self._confirm("Picking up %s %s." % (p["city"], "Now" if not date else "at %s" % _date.strftime("%Y-%m-%d %H:%M:%S"))):
-                    print("POST /pickup/ : %s, %s" % (p["id"], _date.strftime('%Y-%m-%d %H:%M:%S')))
+                    self._post("/1.0/task/", {"type": "manual", "launch_date": _date.strftime('%Y-%m-%d %H:%M:%S'),
+                                             "status": "todo", "project_id": p["id"], "exec_cmd": "", "extend": "{}"})
         return True
 
     def _beautify_project(self, obj):
@@ -150,6 +164,10 @@ class Controller(object):
         obj["stats_students"] = "%s (%.2f%%, %s/%s picked up)" % (len(students), (nb_succeed / len(students)) * 100,
                                                                  nb_succeed, len(students)) \
             if nb_succeed > 0 else "%s" % (len(students))
+        obj["pickups"] = ", ".join(["%s (%s)" % (t["launch_date"], t["status"]) for t in
+                                    sorted(obj["tasks"],
+                                           key=lambda t: datetime.datetime.strptime(t["launch_date"],
+                                                                                    "%Y-%m-%d %H:%M:%S"))])
         #obj.update(obj["template"] if "template" in obj else {})
         # - Template resp: %(templates_resp_join)s
         return """%(title)s - %(city)s (#%(id)s) :
@@ -163,12 +181,11 @@ class Controller(object):
     - Assistants: %(assistants_join)s
     - Resp: %(responsables_join)s
     - Students stats: %(stats_students)s
+    - Pickup(s) : %(pickups)s
 """ % (obj)
 
     """
         Actions interessantes :
-            o Programmer un ramassage : soit maintenant, soit à une date precise, pour une seule ville ou plusieurs
-             => soit avec l'id du projet, ou le slug, ou le nom ?
             o uploader des notes : soit avec un slug +/- ville(s), soit avec l'id
             o stats sur un ramassage (slug + ville, ou id)
             o recuperer adresses emails pour un projet

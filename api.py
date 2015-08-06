@@ -10,6 +10,7 @@ from api_tools import nocache
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQL_DB_URI
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 3600
 try:
     if config.DEBUG:
         app.debug = True
