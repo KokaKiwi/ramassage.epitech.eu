@@ -27,7 +27,10 @@ class ClocMixin(ExecMixin):
             raise Exception("Unable to retrieve cloc data")
         f = io.StringIO(out.outs.decode("utf-8").replace("'", ""))
         rows = []
-        next(f)
+        try:
+            next(f)
+        except StopIteration:
+            return {}
         reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_MINIMAL, quotechar='"')
         for row in reader:
             rows.append(row)
