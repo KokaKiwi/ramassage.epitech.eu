@@ -65,7 +65,7 @@ def index(path=""):
 
     output += "{:<60}{:^20}{:>10}\r\n".format("..", "-", "-").replace("..", "<a href='/%s'>..</a>" %
                                                                       ("/".join(path.split("/")[:-1])))
-    for f in os.listdir(d):
+    for f in sorted(os.listdir(d)):
         stat = os.lstat(os.path.join(d, f))
         date = datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
         output += "{:<60}{:^20}{:>10}\r\n".format(f, date, sizeof_fmt(stat.st_size)).replace(f,
