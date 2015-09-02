@@ -100,7 +100,7 @@ class CrawlerMixin(object):
         return True
 
     def inform_triche(self, task):
-        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % task}
+        opt = {"project_path": os.path.join('/', config.DISTRIBUTE_DIR_IN_JAIL % task)}
         return self._inform(config.TRICHE_URL, task, opt)
 
     def inform_callback(self, task, url):
