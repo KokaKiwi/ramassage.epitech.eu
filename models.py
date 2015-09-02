@@ -214,7 +214,7 @@ class Task(Base):
             "extend": json.loads(self.extend) if self.extend else None
         }
         if with_project:
-            o["project"] = self.project.serialize,
+            o["project"] = self.project.serialize
         return o
 
 """
@@ -330,4 +330,3 @@ if __name__ == "__main__":
             #session.add(ed_user)
             our_user = session.query(User).filter_by(firstname='Steven').first()
             #session.commit()
-

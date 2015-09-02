@@ -22,8 +22,8 @@ CRAWLER_SALT = "??"
 
 # distribute
 
-DISTRIBUTE_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)/%(slug)s")
-CORRECTION_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)/%(slug)s/correction/last")
+DISTRIBUTE_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)s/%(slug)s")
+CORRECTION_DIR_IN_JAIL = os.path.join("/users/%(login)s/%(scolaryear)s/%(codemodule)s/%(slug)s/correction/last")
 DISTRIBUTE_DIR = os.path.join(WORKING_DIR, "jail", DISTRIBUTE_DIR_IN_JAIL)
 CORRECTION_DIR = os.path.join(WORKING_DIR, "jail", CORRECTION_DIR_IN_JAIL)
 TRICHE_LOGIN = "moulinette"

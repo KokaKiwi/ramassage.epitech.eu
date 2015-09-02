@@ -2,6 +2,7 @@ from celery import Celery
 from actions.fetch import Fetch
 from actions.pickup import Pickup
 from actions.judge import Judge
+from actions.inform import InformTriche
 from celery.bin.celery import result
 from celery.result import AsyncResult
 from sqlalchemy import create_engine
@@ -29,6 +30,21 @@ Session.configure(bind=engine)
 @app.task
 def add(x, y):
         return x + y
+
+@app.task
+def inform_triche(task_id):
+    session = Session()
+    try:
+        task = session.query(Task).get(task_id)
+        if not task:
+            raise Exception("This task does not exist.")
+        project = task.project.serialize
+        return InformTriche(project).result
+    except IntegrityError:
+        session.rollback()
+    finally:
+        session.close()
+    return False
 
 @app.task
 def pickup_task(task_id):

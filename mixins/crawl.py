@@ -90,19 +90,22 @@ class CrawlerMixin(object):
             "project_end_date": task["deadline"] if task["deadline"] and len(task["deadline"]) != 0
                                                     and not task["deadline"].startswith("0000") else task["end"],
             }
+        if optional:
+            datas.update(optional)
+        logging.warning(datas)
         status, content = self._raw_post(url, datas, content_type="application/json", verify=False, safe=True)
-        if self.status != 200:
+        if status != 200:
             logging.warning("CrawlerMixin::_inform: url(%s) status(%s) reason(%s)" % (url, status, content))
             return False
         return True
 
     def inform_triche(self, task):
-        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % {task}}
+        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % task}
         return self._inform(config.TRICHE_URL, task, opt)
 
     def inform_callback(self, task, url):
-        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % {task},
-               "correction_path": config.CORRECTION_DIR_IN_JAIL % {task}}
+        opt = {"project_path": config.DISTRIBUTE_DIR_IN_JAIL % task,
+               "correction_path": config.CORRECTION_DIR_IN_JAIL % task}
         return self._inform(url, task, opt)
 
 
@@ -169,5 +172,3 @@ class CrawlerMixin(object):
         if "title" in base and len(base["title"]) > 0:
             result["title"] = base["title"]
         return result
-
-
