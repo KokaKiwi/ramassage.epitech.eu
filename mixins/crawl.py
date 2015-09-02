@@ -93,7 +93,7 @@ class CrawlerMixin(object):
         if optional:
             datas.update(optional)
         logging.warning(datas)
-        status, content = self._raw_post(url, datas, content_type="application/json", verify=False, safe=True)
+        status, content = self._raw_post(url, datas, response_type="application/json", verify=False, safe=True)
         if status != 200:
             logging.warning("CrawlerMixin::_inform: url(%s) status(%s) reason(%s)" % (url, status, content))
             return False
