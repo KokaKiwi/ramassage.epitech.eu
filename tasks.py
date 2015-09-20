@@ -117,6 +117,22 @@ def scheduled_launch_done(task_id):
     return True
 
 @app.task
+def scheduled_triche(task_id):
+    session = Session()
+    #try:
+    current_task = session.query(Task).get(task_id)
+    todos = session.query(Task).join(Project).filter(Project.template_id==1).order_by(Task.launch_date).filter(Task.status != 'succeed').filter(Task.id != current_task.id).all()
+    if current_task.type == 'auto' and len(todos) == 0:
+        project = current_task.project.serialize
+        return InformTriche(project).result
+    #except Exception as e:
+    #    logging.warning(e)
+    #    session.rollback()
+    #finally:
+    #    session.close()
+    return True
+
+@app.task
 def pickup_complete(repos, task_id, project):
     #chain (add.s(4, 4), mul.s(8), mul.s(10))
     # archive, distribute, correction, triche
@@ -125,6 +141,7 @@ def pickup_complete(repos, task_id, project):
     p.distribute()
     p.clean_all()
     scheduled_judge(task_id)
+    scheduled_triche(task_id)
     return None
 
 
