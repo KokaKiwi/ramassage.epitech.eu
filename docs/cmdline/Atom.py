@@ -6,6 +6,11 @@ try:
 except:
     import http.client as httplib
 
+try:
+    from ConfigParser import ConfigParser, Error, NoOptionError
+except:
+    from configparser import ConfigParser, Error, NoOptionError
+
 from optparse import OptionParser, OptionValueError
 import inspect
 import json
@@ -19,17 +24,91 @@ import pytz
 import urllib
 import datetime
 import sys
+import csv
+import logging
 
 VERSION = "0.1 beta"
 
+class Conf:
+    def __init__(self, filename):
+        self._filename = filename
+        try:
+            self._config = ConfigParser(strict=False)
+        except:
+            self._config = ConfigParser()
+        try:
+            self._config.read(os.path.expanduser(filename))
+        except Exception as e:
+            logging.error("[Conf]" + self._filename + ": " + str(e))
+            raise Exception("Error during loading file " + self._filename)
+
+    def getSection(self, section):
+        data={}
+        try:
+            if section in self._config.sections():
+                for name, value in self._config.items(section):
+                    data[name] = value
+        except Exception as e:
+            logging.error("[Conf]" + self._filename + ": " + str(e))
+        for key, value in data.items():
+            if ", " in value:
+                data[key] = value.split(", ")
+        return data
+
+    def get(self, section, option, default=""):
+        val = default
+        try:
+            val = self._config.get(section, option)
+        except:
+            val = default
+        if ", " in val:
+            return val.split(", ")
+        return default
+
+    def sections(self):
+        return self._config.sections()
+
+    def setSection(self, section, values):
+        if not self._config.has_section(section):
+            self._config.add_section(section)
+        for k, v in values.items():
+            self._config.set(section, k, v)
+
+    def setValue(self, section, option, value):
+        if not self._config.has_section(section):
+            self._config.add_section(section)
+        self._config.set(section, option, value)
+
+    def removeSection(self, section):
+        if self._config.has_section(section):
+            self._config.remove_section(section)
+
+    def removeValue(self, section, option):
+        if self._config.has_section(section) and self._config.has_option(section, option):
+            self._config.remove_option(section, option)
+
+    def save(self):
+        with open(self._filename, 'w') as f:
+            self._config.write(f)
+
+    def getAll(self):
+        data = {}
+        for section in self.sections():
+            data[section] = self.getSection(section)
+        return data
 
 class Controller(object):
     def __init__(self):
         self._options = {}
         self._config = {}
-        self._config["URI"] = "127.0.0.1:8080"
-        self._config["UUID"] = "93330b53-d676-4e38-a275-4b147798366c"
-        self._config["HASH"] = "5b10bd446259b8f2d2be0ae955b32ff9da218e5feab9cc3527819b19fa77e2e9"
+
+        config = Conf(os.path.expanduser(".atomrc" if os.path.exists(".atomrc") else "~/.atomrc")).getSection("credentials")
+        self._config["URI"] = os.getenv("URI", "api.ramassage.epitech.eu" if "uri" not in config else config["uri"])
+        self._config["UUID"] = os.getenv("UUID", config["uuid"] if "uuid" in config else None)
+        self._config["HASH"] = os.getenv("HASH", config["hash"] if "hash" in config else None)
+        if "UUID" not in self._config or self._config["UUID"] == None or "HASH" not in self._config or self._config["HASH"] == None:
+            print("ERROR: Credentials are missing", file=sys.stderr)
+            sys.exit(1)
 
     def _sign(self, d, method, url, datas=None):
         if method == "POST":
@@ -108,6 +187,27 @@ class Controller(object):
             if not city or city == p["city"]:
                 #if self._confirm("Displaying %s" % city):
                 print(self._beautify_project(p))
+        return True
+
+    def _write_csv(self, file_name, rows, directory="."):
+        with open(os.path.join(directory, file_name), 'w') as f:
+            writer = csv.writer(f, delimiter=';', quoting=csv.QUOTE_NONE, lineterminator='\n')
+            writer.writerows(rows)
+
+    def loginsAction(self, slug, filename, type="simple"):
+        """ Generate a file containing logins of project(s) corresponding to the slug
+                (type: simple or full)
+        """
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        city = self._options.city
+        l = []
+        for p in projects:
+            if not city or city == p["city"]:
+                for stud in p["students"]:
+                    l.append([stud["user"]["login"]] if type == "simple" else [stud["user"]["login"], p["city"], stud["user"]["firstname"],
+                                 stud["user"]["lastname"]])
+        self._write_csv(filename, l)
         return True
 
     def projectAction(self, uid, *args):
@@ -197,6 +297,11 @@ class Controller(object):
     @property
     def usage(self):
         ret = "usage: %prog [options] command [params...]\n"
+        ret += "Credentials (UUID and HASH) need to be stored in environment or in a file ~/.atomrc\n"
+        ret += "Example:\n"
+        ret += "[credentials]\n"
+        ret += "UUID=...\n"
+        ret += "HASH=...\n\n"
         ret += "Command(s) available:\n"
         for function_name, fn in inspect.getmembers(self.__class__, predicate=inspect.isfunction):
             #print("function_name(%s) : fn(%s)" % (function_name, fn))
@@ -263,8 +368,8 @@ class Controller(object):
         (self._options, args) = parser.parse_args()
         if len(args) == 0:
             return parser.print_usage()
-        print("options: %s" % str(self._options))
-        print("args: %s" % str(args))
+        #print("options: %s" % str(self._options))
+        #print("args: %s" % str(args))
         if not self._execute(args):
             sys.stderr.write(parser.get_usage())
 
