@@ -97,7 +97,7 @@ class CPoolDriver(FsMixin, ExecMixin):
         if not action or len(action) == 0:
             raise Exception("No action to exec")
         action = action % datas
-        r = self._safe_remote_exec(judge, action, timeout=180)
+        r = self._safe_remote_exec(judge, action, timeout=1800)
         logging.warning("CPoolDriver::execute %s" % r.outs)
         logging.warning("CPoolDriver::execute %s" % r.errs)
         return r.return_code
