@@ -14,7 +14,7 @@ class ExecMixin(object):
     def __init__(self):
         pass
 
-    def _safe_exec(self, command, timeout=15, cwd=None):
+    def _safe_exec(self, command, timeout=180, cwd=None):
         if isinstance(command, str):
             command = shlex.split(command)
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
@@ -27,7 +27,7 @@ class ExecMixin(object):
         return ExecResult(proc.returncode, outs, errs)
 
     # Auth by key only
-    def _safe_remote_exec(self, remote, command, timeout=15, cwd=None):
+    def _safe_remote_exec(self, remote, command, timeout=180, cwd=None):
         if isinstance(command, str):
             command = shlex.split(command)
         if cwd:
