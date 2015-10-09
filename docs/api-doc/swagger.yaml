@@ -1,10 +1,10 @@
 swagger: '2.0'
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: api.ramassage.epitech.eu
   description: |
     Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu
-host: '127.0.0.1:8080'
+host: 'api.ramassage.epitech.eu'
 basePath: /1.0
 paths:
   /user/:
@@ -857,7 +857,6 @@ paths:
           type: string
         - in: body
           name: body
-          description: 
           required: true
           schema:
             $ref: '#/definitions/Judge'
@@ -1060,3 +1059,4 @@ definitions:
       type:
         type: string
         description: 'Enum("auto", "preliminary", "manual")'
+  

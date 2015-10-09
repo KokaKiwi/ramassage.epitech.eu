@@ -1,11 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.0.1",
+        "version": "1.0.2",
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
-    "host": "127.0.0.1:8080",
+    "host": "api.ramassage.epitech.eu",
     "basePath": "/1.0",
     "paths": {
         "/user/": {
@@ -1324,7 +1324,6 @@
                     {
                         "in": "body",
                         "name": "body",
-                        "description": null,
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/Judge"
