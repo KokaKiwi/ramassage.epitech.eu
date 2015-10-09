@@ -386,6 +386,27 @@ def api_patch_project(_id):
     return jsonify(t.serialize), 200
 
 
+@project.route('/<int:_id>/judge', methods=["POST"])
+@signed_auth()
+def api_post_project_judge(_id):
+    from api import db, api_return_error
+    from tasks import scheduled_judge
+    try:
+        datas = request.json
+        type_of_judging = datas["kind"] if "kind" in datas else "manual"
+        p = db.session.query(Project).get(_id)
+        if not p:
+            return api_return_error(404, "Project #%s not found" % _id)
+        for task in p.tasks:
+            if task.type == type_of_judging:
+                scheduled_judge.delay(task.id)
+                return jsonify(task.serialize), 200
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return api_return_error(404, "Task not found")
+
 
 @project.route('/<int:_id>/notes', methods=["POST"])
 @signed_auth()

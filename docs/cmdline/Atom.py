@@ -240,6 +240,16 @@ class Controller(object):
                     self._post_notes("/1.0/project/%s/notes" % (p["id"]), filename)
         return True
 
+    def judgeAction(self, slug, _type="manual"):
+        """Judging a specified project"""
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        for p in projects:
+            if not self._options.city or self._options.city == p["city"]:
+                if self._confirm(" %s" % p["city"]):
+                    self._post("/1.0/project/%s/judge" % (p["id"]), {"id": p["id"], "kind": _type})
+        return True
+
     def pickupAction(self, slug, date=None):
         """Schedule a pickup"""
         _date = datetime.datetime.now()
