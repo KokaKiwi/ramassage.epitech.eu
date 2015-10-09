@@ -5,7 +5,7 @@
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
-    "host": "api.ramassage.epitech.eu",
+    "host": "127.0.0.1:8080",
     "basePath": "/1.0",
     "paths": {
         "/user/": {
@@ -1303,6 +1303,54 @@
                     }
                 }
             }
+        },
+        "/project/{project_id}/judge": {
+            "post": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Lance la correction du `Project` correspondant au **project_id**.\n",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "project_id",
+                        "description": "ID du Project",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": null,
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Judge"
+                        }
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/Task"
+                        }
+                    },
+                    "404": {
+                        "description": "Project #{project_id} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -1566,6 +1614,17 @@
                 "extend": {
                     "type": "string",
                     "description": "Json dump"
+                }
+            }
+        },
+        "Judge": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Enum(\"auto\", \"preliminary\", \"manual\")"
                 }
             }
         }
