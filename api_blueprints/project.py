@@ -437,11 +437,10 @@ def api_post_project_notes(_id):
         t = db.session.query(Project).get(_id)
         if not t:
             return api_return_error(404, "Project %s not found" % _id)
-        out = []
-        for sp in t.students:
-            if sp.user.login in rows:
-                out.append(rows[sp.user.login])
         # expand groups
+        login_students = []
+        for sp in t.students:
+            login_students.append(sp.user.login)
         groups = []
         try:
             groups = json.loads(t.groups)
@@ -456,8 +455,13 @@ def api_post_project_notes(_id):
                 for member in group:
                     if member["login"] != master:
                         tmp = dict(rows[master])
-                        tmp["login"] = member["login"]
+                        tmp[hdr[0]] = member["login"]
                         rows[member["login"]] = tmp
+                        login_students.append(member["login"])
+        out = []
+        for login in login_students:
+            if login in rows:
+                out.append(rows[login])
         crawl = CrawlerMixin()
         crawl._post_notes(t.token, out)
         db.session.commit()

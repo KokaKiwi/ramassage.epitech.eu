@@ -60,9 +60,9 @@ class CrawlerMixin(object):
     def _post_notes(self, token, notes):
         up = {}
         for values in notes:
-            key = values["login"]
-            up["notes[%s][note]" % key] = values["note"]
-            up["notes[%s][commentaire]" % key] = values["comment"]
+            key = values["login"] if "login" in values else values["Login"]
+            up["notes[%s][note]" % key] = values["note"] if "note" else values["Note"]
+            up["notes[%s][commentaire]" % key] = values["comment"] if "comment" else values["Comment"]
             if len(up) >= 100:
                 self._post("/upload", token, up)
                 up = {}
