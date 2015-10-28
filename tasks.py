@@ -256,9 +256,9 @@ def fetch(token):
         return t.serialize
     except IntegrityError as e:
         session.rollback()
-    #except Exception as e:
-    #    session.rollback()
-    #    logging.error(str(e))
+    except Exception as e:
+        session.rollback()
+        logging.error(str(e))
     finally:
         session.close()
     return False
