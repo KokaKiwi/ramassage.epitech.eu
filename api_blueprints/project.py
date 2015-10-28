@@ -420,7 +420,23 @@ def api_post_project_notes(_id):
         for sp in t.students:
             if sp.user.login in rows:
                 out.append(rows[sp.user.login])
-
+        # expand groups
+        groups = []
+        try:
+            groups = json.loads(t.groups)
+        except Exception as e:
+            return api_return_error(500, "Unable to expand groups")
+        for group in groups:
+            master = None
+            for member in group:
+                if member["login"] in rows:
+                    master = member["login"]
+            if member:
+                for member in group:
+                    if member["login"] != master:
+                        tmp = dict(rows[master])
+                        tmp["login"] = member["login"]
+                        rows[member["login"]] = tmp
         crawl = CrawlerMixin()
         crawl._post_notes(t.token, out)
         db.session.commit()
