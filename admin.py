@@ -226,7 +226,7 @@ class Current(BaseView):
             mtitle = p.module_title
             success = db.session.query(Project_Student).join(Project).filter(Project.id == p.id)\
             .join(User).filter(Project_Student.status=="Succeed").count()
-            p.success = "%0.2f" % float(success * 100 / len(p.students))
+            p.success = "%0.2f" % float(success * 100 / len(p.students)) if len(p.students) > 0 else "0"
 
         pname = max(pnames.keys(), key=lambda key: pnames[key])
         return self.render("projects.html", _id =_id, tpl = obj, current=current, past=past, module_title=mtitle,
