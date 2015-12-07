@@ -145,7 +145,7 @@ class Project(Base):
 
     @property
     def city(self):
-        return self.location.split("/")[1]
+        return self.location.split("/")[1] if len(self.location.split("/")) > 1 else self.location
 
     def __repr__(self):
         return "Project('%s', token='%s', template_id='%s', '%s', " \
