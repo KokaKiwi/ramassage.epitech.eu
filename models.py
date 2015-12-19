@@ -119,14 +119,14 @@ class Project(Base):
     token = Column(String(40), nullable=False)
     template_id = Column(Integer, ForeignKey('template.id'))
     scolaryear = Column(Integer, nullable=False)
-    module_title = Column(String(40), nullable=False)
+    module_title = Column(String(90), nullable=False)
     module_code = Column(String(40), nullable=False)
     instance_code = Column(String(15), nullable=False)
     location = Column(String(20), nullable=False)
     title = Column(String(50), nullable=False)
     deadline = Column(DateTime, nullable=False)
     promo = Column(Integer, nullable=True)
-    groups = Column(Text, nullable=True) # json packed groups
+    groups = Column(Text(length=2**19), nullable=True) # json packed groups
     students = relationship("Project_Student", backref=backref("project"),
                             cascade="save-update, merge, delete, delete-orphan")
     resp = relationship("User",
