@@ -65,6 +65,8 @@ def api_get_task(_id):
         return api_return_error(500, "Server error", str(e))
     return jsonify(t.serialize), 200
 
+#@task.route('/<int:_id>/file', methods=["GET"])
+
 
 @task.route('/<string:slug>', methods=["GET"])
 @signed_auth()

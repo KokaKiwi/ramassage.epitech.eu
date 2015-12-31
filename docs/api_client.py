@@ -43,7 +43,10 @@ class Client(object):
         dir = "."
         url = os.path.join(dir, str(uuid.uuid4()) + ".zip")
         with open(url, 'wb') as f:
-            f.write(response.read(65 * 1024))
+            resp = response.read(65 * 1024)
+            while resp:
+                f.write(resp)
+                resp = response.read(65 * 1024)
         return {"file": url}
 
     def _req(self, method, url, datas=None, data_type="application/json"):

@@ -31,3 +31,11 @@ class RepositoryNameMissing(Exception):
 
     def __str__(self):
         return self.msg
+
+
+class FileMissing(Exception):
+    def __init__(self, msg='File is missing.'):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg

@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "version": "1.0.2",
+        "version": "1.0.3",
         "title": "api.ramassage.epitech.eu",
         "description": "Documentation expliquant le fonctionnement de l'api de ramassage.epitech.eu\n"
     },
@@ -735,6 +735,42 @@
                 }
             }
         },
+        "/task/{task_id}/file": {
+            "get": {
+                "tags": [
+                    "task"
+                ],
+                "description": "Récupérer l'archive zip attachée à la task #**task_id**.\n",
+                "produces": [
+                    "application/zip"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "task_id",
+                        "description": "ID de la Task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archive zip"
+                    },
+                    "404": {
+                        "description": "Archive not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
         "/task/project/{project_id}": {
             "get": {
                 "tags": [
@@ -1108,6 +1144,78 @@
                     },
                     "404": {
                         "description": "Project #{token} not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/{project_id}/delivery/last": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer l'archive zip correspondant au dernier ramassage du projet #**project_id**.\n",
+                "produces": [
+                    "application/zip"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "project_id",
+                        "description": "ID du Project",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archive zip"
+                    },
+                    "404": {
+                        "description": "Project Archive not found",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/project/{project_id}/delivery/official": {
+            "get": {
+                "tags": [
+                    "project"
+                ],
+                "description": "Récupérer l'archive zip correspondant au ramassage officiel du projet #**project_id**.\n",
+                "produces": [
+                    "application/zip"
+                ],
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "project_id",
+                        "description": "ID du Project",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "security": [
+                    {
+                        "api_signature": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Archive zip"
+                    },
+                    "404": {
+                        "description": "Project Archive not found",
                         "schema": {
                             "$ref": "#/definitions/Error"
                         }

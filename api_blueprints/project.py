@@ -1,6 +1,6 @@
 __author__ = 'steven'
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, send_from_directory
 from sqlalchemy.exc import IntegrityError
 from models import Project, Project_Student, Template, Task, User
 import logging
@@ -155,6 +155,32 @@ def api_get_project_token(token):
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
     return jsonify(p.serialize), 200
+
+
+@project.route('/<int:_id>/delivery/last', methods=["GET"])
+@signed_auth()
+@nocache
+def api_get_project_delivery_last(_id):
+    from api import db, api_return_error
+    from actions.send import SendFile
+    from exceptions import FileMissing
+    try:
+        p = db.session.query(Project).get(_id)
+        if not p:
+            return api_return_error(404, "Project #%s not found" % _id)
+        s = SendFile(p.serialize)
+    except FileMissing as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(404, str(e))
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return send_from_directory(*s.path())
+
+#/delivery/last
+#/delivery/official
 
 
 @project.route('/slug/<string:slug>', methods=["GET"])
