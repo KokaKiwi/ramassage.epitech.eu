@@ -250,6 +250,7 @@ def fetch(token):
                 need_new = False
             if task.type == "auto" and task.status != "ongoing":
                 task.launch_date = t.deadline
+                task.status = "todo"
                 session.add(task)
         if need_new:
             session.add(Task(type="auto", launch_date=t.deadline, project=t))
