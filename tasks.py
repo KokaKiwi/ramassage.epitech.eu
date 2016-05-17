@@ -72,7 +72,7 @@ def scheduled_launch(task_id, token):
         obj.status = "ongoing"
         session.add(obj)
         session.commit()
-        chain(fetch.si(token), pickup_task.si(task_id))()
+        chain(fetch.si(token, task_id), pickup_task.si(task_id))()
         return True
     except Exception as e:
         logging.warning(e)
@@ -180,7 +180,7 @@ def fetch_onerror(uuid, token, retry):
     # relaunch T.apply_async(countdown=60
 
 @app.task
-def fetch(token):
+def fetch(token, task_id=None):
     session = Session()
     try:
         obj = Fetch(token)
@@ -248,7 +248,7 @@ def fetch(token):
         for task in t.tasks:
             if task.type == "auto":
                 need_new = False
-            if task.type == "auto" and task.status != "ongoing":
+            if task.type == "auto" and task.status != "ongoing" and task.id != task_id:
                 task.launch_date = t.deadline
                 task.status = "todo"
                 session.add(task)
