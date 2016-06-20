@@ -150,7 +150,7 @@ def api_get_project_refresh(_id):
         p = db.session.query(Project).get(_id)
         if not p:
             return api_return_error(404, "Project #%s not found" % _id)
-        fetch.delay(p.token)
+        fetch.delay(p.token, 0)
     except Exception as e:
         db.session.rollback()
         logging.error(str(e))

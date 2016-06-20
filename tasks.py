@@ -248,7 +248,7 @@ def fetch(token, task_id=None):
         for task in t.tasks:
             if task.type == "auto":
                 need_new = False
-            if task.type == "auto" and task.status != "ongoing" and task.id != task_id:
+            if task.type == "auto" and task.status != "ongoing" and task.id != task_id and task_id != 0:
                 task.launch_date = t.deadline
                 task.status = "todo"
                 session.add(task)
