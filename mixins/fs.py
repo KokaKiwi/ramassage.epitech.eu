@@ -69,51 +69,47 @@ class FsMixin(ExecMixin):
 
     def _new_version(self, filename, with_extension=True):
         file_spec, ext = os.path.splitext(filename)
-        if os.path.isfile(filename):
-            file_spec, ext = os.path.splitext(filename)
-            n, e = os.path.splitext(file_spec)
-            try:
-                 num = int(e)
-                 root = n
-            except ValueError:
-                 root = n
-            _max = -1
-            base = os.path.basename(root)
-            for file in os.listdir(os.path.dirname(filename)):
-                if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
-                    try:
-                        v = int(file.split(".")[1])
-                        if v > _max:
-                            _max = v
-                    except ValueError:
-                        pass
-            return '%s.%03d%s' % (root, _max + 1, ext if with_extension else "")
-        return filename if with_extension else file_spec
+        n, e = os.path.splitext(file_spec)
+        try:
+             num = int(e)
+             root = n
+        except ValueError:
+             root = n
+        _max = -1
+        base = os.path.basename(root)
+        for file in os.listdir(os.path.dirname(filename)):
+            if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
+                try:
+                    v = int(file.split(".")[1])
+                    if v > _max:
+                        _max = v
+                except ValueError:
+                    pass
+        if _max == -1:
+            return filename if with_extension else file_spec
+        return '%s.%03d%s' % (root, _max + 1, ext if with_extension else "")
 
     def _last_version(self, filename, with_extension=True):
         file_spec, ext = os.path.splitext(filename)
-        if os.path.isfile(filename):
-            file_spec, ext = os.path.splitext(filename)
-            n, e = os.path.splitext(file_spec)
-            try:
-                 num = int(e)
-                 root = n
-            except ValueError:
-                 root = n
-            _max = -1
-            base = os.path.basename(root)
-            for file in os.listdir(os.path.dirname(filename)):
-                if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
-                    try:
-                        v = int(file.split(".")[1])
-                        if v > _max:
-                            _max = v
-                    except ValueError:
-                        pass
-            if _max == -1:
-                return filename
-            return '%s.%03d%s' % (root, _max, ext if with_extension else "")
-        return filename if with_extension else file_spec
+        n, e = os.path.splitext(file_spec)
+        try:
+             num = int(e)
+             root = n
+        except ValueError:
+             root = n
+        _max = -1
+        base = os.path.basename(root)
+        for file in os.listdir(os.path.dirname(filename)):
+            if file.startswith(base) and len(file.split(".")) >= 3 and file.endswith(ext):
+                try:
+                    v = int(file.split(".")[1])
+                    if v > _max:
+                        _max = v
+                except ValueError:
+                    pass
+        if _max == -1:
+            return filename if with_extension else file_spec
+        return '%s.%03d%s' % (root, _max, ext if with_extension else "")ls
 
     def _distribute_for_user(self, datas, filepath, filename):
         path = os.path.join(config.WORKING_DIR, "jail", config.DISTRIBUTE_DIR_IN_JAIL % datas)
@@ -133,4 +129,3 @@ class FsMixin(ExecMixin):
         for user in users:
             datas["login"] = user["login"]
             self._distribute_for_user(datas, filepath, filename)
-
