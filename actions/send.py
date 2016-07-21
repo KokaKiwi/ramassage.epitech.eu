@@ -15,7 +15,7 @@ class SendFile(FsMixin):
             self._project["title"], self._project["city"])))
         filename = self._last_version("%s.zip" % (archive_name), with_extension=True)
         logging.warning(filename)
-        if not os.path.isfile("%s" % (archive_name)):
+        if not os.path.isfile(filename):
             raise FileMissing()
         filename = os.path.basename(filename)
         filepath = config.ARCHIVE_DIR
