@@ -109,7 +109,7 @@ class FsMixin(ExecMixin):
                     pass
         if _max == -1:
             return filename if with_extension else file_spec
-        return '%s.%03d%s' % (root, _max, ext if with_extension else "")ls
+        return '%s.%03d%s' % (root, _max, ext if with_extension else "")
 
     def _distribute_for_user(self, datas, filepath, filename):
         path = os.path.join(config.WORKING_DIR, "jail", config.DISTRIBUTE_DIR_IN_JAIL % datas)
