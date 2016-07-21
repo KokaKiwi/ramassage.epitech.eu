@@ -85,7 +85,7 @@ class FsMixin(ExecMixin):
                         _max = v
                 except ValueError:
                     pass
-        if _max == -1:
+        if _max == -1 and not os.path.isfile(filename):
             return filename if with_extension else file_spec
         return '%s.%03d%s' % (root, _max + 1, ext if with_extension else "")
 
