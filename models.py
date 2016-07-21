@@ -130,14 +130,14 @@ class Project(Base):
     students = relationship("Project_Student", backref=backref("project"),
                             cascade="save-update, merge, delete, delete-orphan")
     resp = relationship("User",
-                    secondary=project_resp_user_table,
-                    backref="projects_as_resp")
+                        secondary=project_resp_user_table,
+                        backref="projects_as_resp", cascade="save-update, merge, delete")
     template_resp = relationship("User",
-                    secondary=project_templateresp_user_table,
-                    backref="projects_as_templateresp")
+                                 secondary=project_templateresp_user_table,
+                                 backref="projects_as_templateresp", cascade="save-update, merge, delete")
     assistants = relationship("User",
-                    secondary=project_assistant_user_table,
-                    backref="projects_as_assistant")
+                              secondary=project_assistant_user_table,
+                              backref="projects_as_assistant", cascade="save-update, merge, delete")
     last_update = Column(DateTime, nullable=False)
     last_action = Column(DateTime, nullable=True)
     tasks = relationship("Task", backref=backref("project"))

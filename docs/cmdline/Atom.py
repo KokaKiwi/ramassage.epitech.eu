@@ -217,6 +217,12 @@ class Controller(object):
         print(self._beautify_project(res))
         return True
 
+    def moulitricheAction(self, slug, *args):
+        """Call moulitriche for the specified slug"""
+        res = self._get("/1.0/project/slug/%s/moulitriche" % slug)
+        print(res)
+        return True
+
     def statsAction(self, slug):
         """Display pickup's statistics"""
         res = self._get("/1.0/project/slug/%s" % slug)
@@ -238,6 +244,16 @@ class Controller(object):
             if not self._options.city or self._options.city == p["city"]:
                 if self._confirm(" %s" % p["city"]):
                     self._post_notes("/1.0/project/%s/notes" % (p["id"]), filename)
+        return True
+
+    def refreshAction(self, slug):
+        """Update local data from intranet"""
+        res = self._get("/1.0/project/slug/%s" % slug)
+        projects = sorted(res["projects"], key=lambda k: k["city"], reverse=False)
+        for p in projects:
+            if not self._options.city or self._options.city == p["city"]:
+                if self._confirm(" %s" % p["city"]):
+                    self._get("/1.0/project/%s/refresh" % (p["id"]))
         return True
 
     def judgeAction(self, slug, _type="manual"):

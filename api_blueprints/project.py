@@ -140,6 +140,24 @@ def api_get_project(_id):
     return jsonify(p.serialize), 200
 
 
+@project.route('/<int:_id>/refresh', methods=["GET"])
+@signed_auth()
+@nocache
+def api_get_project_refresh(_id):
+    from api import db, api_return_error
+    from tasks import fetch
+    try:
+        p = db.session.query(Project).get(_id)
+        if not p:
+            return api_return_error(404, "Project #%s not found" % _id)
+        fetch.delay(p.token, 0)
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify(p.serialize), 200
+
+
 @project.route('/token/<string:token>', methods=["GET"])
 @project.route('/<string:token>', methods=["GET"])
 @signed_auth()
@@ -197,6 +215,24 @@ def api_get_project_slug(slug):
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
     return jsonify({"projects": [p.serialize for p in projects]}), 200
+
+@project.route('/slug/<string:slug>/moulitriche', methods=["GET"])
+@signed_auth()
+@nocache
+def api_get_project_slug_moulitriche(slug):
+    from api import db, api_return_error
+    from actions.inform import InformTriche
+    result = False
+    try:
+        project = db.session.query(Project).join(Project.template).filter(Template.slug==slug).first()
+        if not project:
+            return api_return_error(404, "Slug %s not found" % slug)
+        result = InformTriche(project.serialize).result
+    except Exception as e:
+        db.session.rollback()
+        logging.error(str(e))
+        return api_return_error(500, "Server error", str(e))
+    return jsonify({"status": result}), 200
 
 
 @project.route('/template/<int:_id>', methods=["GET"])

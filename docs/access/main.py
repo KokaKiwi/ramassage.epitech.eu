@@ -70,7 +70,7 @@ def index(path=""):
         date = datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
         output += "{:<60}{:^20}{:>10}\r\n".format(f, date, sizeof_fmt(stat.st_size)).replace(f,
                                                                                              "<a href='/%s'>%s</a>" %
-                                                                                             (os.path.join(path, f), f))
+                                                                                             (os.path.join(path, f.replace(" ", "%20")), f))
     output += "</pre><hr>" \
               "</body></html>"
     return output
