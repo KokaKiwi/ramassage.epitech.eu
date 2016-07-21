@@ -56,12 +56,12 @@ class FsMixin(ExecMixin):
         return None
 
     def _archive(self, path, archive_name, root_dir, versioned=False, _format="zip"):
-        logging.debug("_archive:: %s.zip < %s" % (archive_name, root_dir))
+        logging.info("_archive:: %s.zip < %s" % (archive_name, root_dir))
         if not path:
             self._makedirs(path)
         archive_name = os.path.join(path, archive_name)
         if versioned:
-            archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=True)
+            archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=False)
         own = self._make_archive(os.path.join(path, archive_name),  _format, root_dir)
         if not own:
             return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
