@@ -61,7 +61,7 @@ class FsMixin(ExecMixin):
             self._makedirs(path)
         archive_name = os.path.join(path, archive_name)
         if versioned:
-            archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=False)
+            archive_name = self._new_version("%s.%s" % (archive_name, _format), with_extension=True)
         own = self._make_archive(os.path.join(path, archive_name),  _format, root_dir)
         if not own:
             return shutil.make_archive(os.path.join(path, archive_name),  _format, root_dir)
