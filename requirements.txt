@@ -27,3 +27,6 @@ redis==2.10.3
 requests==2.6.0
 six==1.9.0
 tornado==4.1
+sqlalchemy_utils
+flask_login
+blinker 
