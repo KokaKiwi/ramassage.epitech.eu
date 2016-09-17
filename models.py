@@ -8,6 +8,8 @@ from config import SQL_URI, SQL_DB_URI
 import sys
 import datetime,json
 
+from flask_dance.consumer.backend.sqla import OAuthConsumerMixin
+from flask_login import UserMixin
 
 Base = declarative_base()
 
@@ -18,12 +20,12 @@ def dump_datetime(value, split=True):
         return None
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if split else value.strftime("%Y-%m-%d %H:%M:%S")
 
-class User(Base):
+class User(Base, UserMixin):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
     firstname = Column(String(50), nullable=True)
     lastname = Column(String(50), nullable=True)
-    login = Column(String(30), unique=True, nullable=False)
+    login = Column(String(120), unique=True, nullable=False)
 
     def __repr__(self):
         return "User('%s', '%s %s', '%s')" % (self.id,
@@ -33,6 +35,25 @@ class User(Base):
     @property
     def serialize(self):
         return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname, "login": self.login}
+
+#    @property
+#    def is_authenticated(self):
+#        return True
+
+#    @property
+#    def is_anonymous(self):
+#        return False
+
+#    @property
+#    def is_active(self):
+#        return True
+
+#    def get_id(self):
+#        return self.id
+
+class OAuth(Base, OAuthConsumerMixin):
+    user_id = Column(Integer, ForeignKey(User.id))
+    user = relationship(User)
 
 class Template(Base):
     __tablename__ = 'template'
