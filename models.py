@@ -25,7 +25,7 @@ class User(Base, UserMixin):
     id = Column(Integer, primary_key=True)
     firstname = Column(String(50), nullable=True)
     lastname = Column(String(50), nullable=True)
-    login = Column(String(120), unique=True, nullable=False)
+    login = Column(String(200), unique=True, nullable=False)
 
     def __repr__(self):
         return "User('%s', '%s %s', '%s')" % (self.id,
