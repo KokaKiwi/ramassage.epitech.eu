@@ -94,9 +94,9 @@ class GitMixin(FsMixin):
         obj.clean()
         return obj.succeed(), obj
 
-    def _retrieve_repository(self, student, repository_name, task_id, city):
+    def _retrieve_repository(self, student, repository_name, task_id, city, old_student=None):
         local_uri = os.path.join(config.REPOS_DIR, "%(task_id)s/%(repos)s/%(stud)s" % {"task_id": task_id, "repos": repository_name, "stud": student})
-        uri = config.REPOS_URI % {"repos": repository_name, "stud": student}
+        uri = config.REPOS_URI % {"repos": repository_name, "stud": old_student if old_student else student}
         return self._retrieve_repository_(local_uri, uri, city)
 
     def _remove_repository_(self, local_uri):

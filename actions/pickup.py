@@ -5,6 +5,9 @@ from exceptions import RepositoryNameMissing
 import logging
 import os
 import config
+from api_tools import Mapping
+
+mapping = Mapping()
 
 class Pickup(GitMixin):
     def __init__(self, task_id, project):
@@ -14,9 +17,10 @@ class Pickup(GitMixin):
     def one(self, login):
         if not self._project["template"]["repository_name"] or len(self._project["template"]["repository_name"]) == 0:
             raise RepositoryNameMissing()
+        old_login = mapping.users[login] if login in mapping.users else None
         logging.info("Pickup.one(%s)" % (login))
         succeed, repo = self._retrieve_repository(login, self._project["template"]["repository_name"],
-                                  self._task_id, self._project["city"])
+                                  self._task_id, self._project["city"], old_login)
         return succeed, repo
 
     def clean_all(self):
