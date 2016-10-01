@@ -18,7 +18,6 @@ import json
 from datetime import datetime
 from celery import chord
 from celery import chain
-from api_tools import Mapping
 
 app = Celery('tasks')
 app.config_from_object("workerconfig")
@@ -27,8 +26,6 @@ engine = create_engine(config.SQL_DB_URI, echo=True, pool_recycle=3600)
 from sqlalchemy.orm import sessionmaker
 Session = sessionmaker()
 Session.configure(bind=engine)
-
-mapping = Mapping()
 
 @app.task
 def add(x, y):
@@ -219,7 +216,7 @@ def fetch(token, task_id=None):
             u = session.query(User).filter_by(login=user["login"]).first()
             if not u:
                 u = User(firstname=user["firstname"], lastname=user["lastname"],
-                         login=user["login"], old_login=mapping.users[user["login"]] if user["login"] in mapping.users else None)
+                         login=user["login"], old_login=user["old_login"])
                 session.add(u)
             resp.append(u)
         t.resp = resp
@@ -228,7 +225,7 @@ def fetch(token, task_id=None):
             u = session.query(User).filter_by(login=user["login"]).first()
             if not u:
                 u = User(firstname=user["firstname"], lastname=user["lastname"],
-                         login=user["login"], old_login=mapping.users[user["login"]] if user["login"] in mapping.users else None)
+                         login=user["login"], old_login=user["old_login"])
                 session.add(u)
             template_resp.append(u)
         t.template_resp = template_resp
@@ -237,7 +234,7 @@ def fetch(token, task_id=None):
             u = session.query(User).filter_by(login=user["login"]).first()
             if not u:
                 u = User(firstname=user["firstname"], lastname=user["lastname"],
-                         login=user["login"], old_login=mapping.users[user["login"]] if user["login"] in mapping.users else None)
+                         login=user["login"], old_login=user["old_login"])
                 session.add(u)
             assistants.append(u)
         t.assistants = assistants
@@ -246,7 +243,7 @@ def fetch(token, task_id=None):
             u = session.query(User).filter_by(login=user["login"]).first()
             if not u:
                 u = User(firstname=user["firstname"], lastname=user["lastname"],
-                         login=user["login"], old_login=mapping.users[user["login"]] if user["login"] in mapping.users else None)
+                         login=user["login"], old_login=user["old_login"])
                 session.add(u)
             t.students.append(Project_Student(user=u, project=t))
 

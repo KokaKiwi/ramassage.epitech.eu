@@ -6,7 +6,9 @@ import config
 import logging
 import hashlib
 import os
+from api_tools import Mapping
 
+mapping = Mapping()
 
 class CrawlerMixin(object):
     def __init__(self):
@@ -116,7 +118,8 @@ class CrawlerMixin(object):
                 return ret
             for elem in obj[key]:
                 ret.append({"login": elem["login"], "firstname": elem["title"].split(" ")[0],
-                            "lastname": elem["title"].split(" ")[1], "title": elem["title"]})
+                            "lastname": elem["title"].split(" ")[1], "title": elem["title"],
+                            "old_login": mapping.users[elem["login"]] if elem["login"] in mapping.users else None})
             return ret
 
         _conversion = {"0": 5, "1": 5, "2": 5,
@@ -136,13 +139,15 @@ class CrawlerMixin(object):
             if not group["master"]["login"] in users:
                 g = []
                 m = {"login": group["master"]["login"], "firstname": group["master"]["title"].split(" ")[0],
-                          "lastname": group["master"]["title"].split(" ")[1], "title": group["master"]["title"]}
+                     "lastname": group["master"]["title"].split(" ")[1], "title": group["master"]["title"],
+                     "old_login": mapping.users[group["master"]["login"]] if group["master"]["login"] in mapping.users else None}
                 users.append(m)
                 g.append(m)
                 if "members" in group:
                     for member in group["members"]:
                         g.append({"login": member["login"], "firstname": member["title"].split(" ")[0],
-                                  "lastname": member["title"].split(" ")[1], "title": member["title"]})
+                                  "lastname": member["title"].split(" ")[1], "title": member["title"],
+                                  "old_login": mapping.users[member["login"]] if member["login"] in mapping.users else None})
                 clean_groups.append(g)
 
         result = {
