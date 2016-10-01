@@ -13,6 +13,7 @@ import pytz
 import base64
 import hmac
 import logging
+import csv
 
 def intranet_auth():
     def wrapper(f):
@@ -94,3 +95,37 @@ def signed_auth():
             return api_return_error(403, "Not allowed", "Signature mismatch")
         return wrapped
     return wrapper
+
+
+class Mapping(object):
+    def _get_users(self):
+        try:
+            users = {}
+            with open(config.PASSWORD_FILE, 'r') as f:
+                reader = csv.reader(f, delimiter=':', quoting=csv.QUOTE_NONE)
+                #0: login
+                #1: password
+                #7: firstname lastname
+
+                for row in reader:
+                    if len(row[7].split(" ")) != 2:
+                        continue
+                    firstname, lastname = row[7].split(" ")
+                    users["%s.%s@epitech.eu" % (firstname, lastname)] = row[0]
+                return users
+        except Exception as e:
+            logging.error(str(e))
+        return {}
+
+    def __getattr__(self, name):
+        if name == 'users':
+            users = self.users = self._get_users()
+            return users
+        return super(Mapping, self).__getattr__(name)
+
+
+if __name__ == "__main__":
+    m = Mapping()
+    print(m.users)
+    print(m.users)
+    print(m.users)

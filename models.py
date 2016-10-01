@@ -26,15 +26,16 @@ class User(Base, UserMixin):
     firstname = Column(String(50), nullable=True)
     lastname = Column(String(50), nullable=True)
     login = Column(String(200), unique=True, nullable=False)
+    old_login = Column(String(30), nullable=True)
 
     def __repr__(self):
-        return "User('%s', '%s %s', '%s')" % (self.id,
+        return "User('%s', '%s %s', '%s', '%s')" % (self.id,
                                                                                    self.firstname,
                                                                                    self.lastname,
-                                                                                   self.login)
+                                                                                   self.login, self.old_login)
     @property
     def serialize(self):
-        return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname, "login": self.login}
+        return {"id": self.id, "firstname": self.firstname, "lastname": self.lastname, "login": self.login, "old_login": self.old_login}
 
 #    @property
 #    def is_authenticated(self):
