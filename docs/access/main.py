@@ -12,6 +12,35 @@ auth = HTTPBasicAuth()
 app.debug = True if config.DEBUG else False
 
 
+class Mapping(object):
+    def _get_users(self):
+        try:
+            users = {}
+            with open(config.PASSWORD_FILE, 'r') as f:
+                reader = csv.reader(f, delimiter=':', quoting=csv.QUOTE_NONE)
+                #0: login
+                #1: password
+                #7: firstname lastname
+
+                for row in reader:
+                    if len(row[7].split(" ")) != 2:
+                        continue
+                    firstname, lastname = row[7].split(" ")
+                    users[row[0]] = "%s.%s@epitech.eu" % (firstname, lastname)
+                return users
+        except Exception as e:
+            logging.error(str(e))
+        return {}
+
+    def __getattr__(self, name):
+        if name == 'users':
+            users = self.users = self._get_users()
+            return users
+        return super(Mapping, self).__getattr__(name)
+
+mapping = Mapping()
+
+
 class Auth(object):
     @staticmethod
     def checkHash(encrypted, plain):
@@ -31,7 +60,7 @@ class Auth(object):
 @auth.verify_password
 def authenticate(username=None, password=None):
     logging.info("authenticate: %s" % username)
-    if not os.path.exists(os.path.join(config.BASE_DIR, username)):
+    if not os.path.exists(os.path.join(config.BASE_DIR, mapping.users[username] if username in mapping.users else username)):
         logging.warning("authenticate: %s, path not found" % username)
         return None
     if Auth.checkInPasswd(username, password):
@@ -50,18 +79,19 @@ def sizeof_fmt(num, suffix='B'):
 @app.route('/')
 @auth.login_required
 def index(path=""):
-    rpath = "~%s/%s" % (auth.username(), path)
+    username = mapping.users[auth.username()] if auth.username() in mapping.users else auth.username()
+    rpath = "~%s/%s" % (username, path)
     output = "<html><head><title>Index of /%s</title></head>" \
              "<body bgcolor='white'>" \
              "<h1>Index of /%s</h1><hr><pre>" % (rpath, rpath)
-    d = os.path.join(config.BASE_DIR, auth.username())
+    d = os.path.join(config.BASE_DIR, username)
     d = os.path.join(d, path)
     d = os.path.realpath(d)
-    if len(d) < len(os.path.join(config.BASE_DIR, auth.username())):
+    if len(d) < len(os.path.join(config.BASE_DIR, username)):
         return "Not allowed", 403
     if os.path.isfile(d):
-        logging.warning("send_from_directory: %s, %s" % (os.path.join(config.BASE_DIR, auth.username()), path))
-        return send_from_directory(os.path.join(config.BASE_DIR, auth.username()), path)
+        logging.warning("send_from_directory: %s, %s" % (os.path.join(config.BASE_DIR, username), path))
+        return send_from_directory(os.path.join(config.BASE_DIR, username), path)
 
     output += "{:<60}{:^20}{:>10}\r\n".format("..", "-", "-").replace("..", "<a href='/%s'>..</a>" %
                                                                       ("/".join(path.split("/")[:-1])))
