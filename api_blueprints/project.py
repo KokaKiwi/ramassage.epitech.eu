@@ -177,7 +177,6 @@ def api_get_project_token(token):
 
 @project.route('/<int:_id>/delivery/last', methods=["GET"])
 @signed_auth()
-@nocache
 def api_get_project_delivery_last(_id):
     from api import db, api_return_error
     from actions.send import SendFile
