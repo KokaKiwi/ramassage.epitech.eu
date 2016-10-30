@@ -48,6 +48,25 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 
+def cached(**kwargs):
+    '''
+        Cache decorator to manipulate the cache-control header for a specified
+        route.
+
+        The keyword argument's names must match the attribute's names of
+        :py:class:`werkzeug.datastructures.ResponseCacheControl`
+    '''
+    def wrapper(view):
+        @wraps(view)
+        def wrapped(*args, **kwargs):
+            response = make_response(view(*args, **kwargs))
+            for (name, value) in kwargs.items():
+                setattr(response.cache_control, name, value)
+            return response
+        return wrapped
+    return wrapper
+
+
 def signed_auth():
     def wrapper(f):
         @wraps(f)

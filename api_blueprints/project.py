@@ -9,7 +9,7 @@ from datetime import datetime
 
 project = Blueprint('project', __name__)
 
-from api_tools import signed_auth, nocache
+from api_tools import signed_auth, nocache, cached
 
 
 @project.route('/', methods=["GET"])
@@ -177,7 +177,7 @@ def api_get_project_token(token):
 
 @project.route('/<int:_id>/delivery/last', methods=["GET"])
 @signed_auth()
-@nocache
+@cached(max_age=0, must_revalidate=True)
 def api_get_project_delivery_last(_id):
     from api import db, api_return_error
     from actions.send import SendFile
