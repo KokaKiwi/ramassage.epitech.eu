@@ -31,14 +31,14 @@ class Pickup(GitMixin):
     def archive(self):
         repos_uri = os.path.join(config.REPOS_DIR, "%(task_id)s/%(repos)s" %
                                  {"task_id": self._task_id, "repos": self._project["template"]["repository_name"]})
-        arch = self._cleanfilename("%s-%s" % (self._project["title"], self._project["city"]))
+        arch = self._cleanfilename("%s-%s" % (self._project["title"], self._project["instance_code"]))
         self._archive(config.ARCHIVE_DIR, arch,
                       repos_uri, versioned=True)
         return arch
 
     def distribute(self):
         archive_name = os.path.join(config.ARCHIVE_DIR, self._cleanfilename("%s-%s" % (
-            self._project["title"], self._project["city"])))
+            self._project["title"], self._project["instance_code"])))
         filename = self._last_version("%s.zip" % (archive_name), with_extension=True)
         filename = os.path.basename(filename)
         filepath = config.ARCHIVE_DIR

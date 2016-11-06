@@ -12,7 +12,7 @@ class SendFile(FsMixin):
 
     def path(self):
         archive_name = os.path.join(config.ARCHIVE_DIR, self._cleanfilename("%s-%s" % (
-            self._project["title"], self._project["city"])))
+            self._project["title"], self._project["instance_code"])))
         filename = self._last_version("%s.zip" % (archive_name), with_extension=True)
         logging.warning(filename)
         if not os.path.isfile(filename):

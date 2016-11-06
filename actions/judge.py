@@ -51,7 +51,7 @@ class CPoolDriver(FsMixin, ExecMixin):
     def prepare(self):
         self._generate_simple_list()
         self._generate_full_list()
-        arch = self._cleanfilename("%s-%s" % (self._project["title"], self._project["city"]))
+        arch = self._cleanfilename("%s-%s" % (self._project["title"], self._project["instance_code"]))
         archive_name = os.path.join(config.ARCHIVE_DIR, arch)
         archive_name = self._last_version("%s.zip" % (archive_name), with_extension=True)
         base_arch = os.path.basename(archive_name)
