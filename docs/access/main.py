@@ -79,9 +79,11 @@ def sizeof_fmt(num, suffix='B'):
 @app.route('/')
 @auth.login_required
 def index(path=""):
+    alt=False
     username = mapping.users[auth.username()] if auth.username() in mapping.users else auth.username()
-    if request.args.get('alt'):
+    if 'alt' in request.args:
         username = auth.username()
+        alt = True
     rpath = "~%s/%s" % (username, path)
     output = "<html><head><title>Index of /%s</title></head>" \
              "<body bgcolor='white'>" \
@@ -95,14 +97,14 @@ def index(path=""):
         logging.warning("send_from_directory: %s, %s" % (os.path.join(config.BASE_DIR, username), path))
         return send_from_directory(os.path.join(config.BASE_DIR, username), path)
 
-    output += "{:<60}{:^20}{:>10}\r\n".format("..", "-", "-").replace("..", "<a href='/%s'>..</a>" %
-                                                                      ("/".join(path.split("/")[:-1])))
+    output += "{:<60}{:^20}{:>10}\r\n".format("..", "-", "-").replace("..", "<a href='/%s%s'>..</a>" %
+                                                                      ("/".join(path.split("/")[:-1]), "?alt" if alt else ""))
     for f in sorted(os.listdir(d)):
         stat = os.lstat(os.path.join(d, f))
         date = datetime.datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
         output += "{:<60}{:^20}{:>10}\r\n".format(f, date, sizeof_fmt(stat.st_size)).replace(f,
-                                                                                             "<a href='/%s'>%s</a>" %
-                                                                                             (os.path.join(path, f.replace(" ", "%20")), f))
+                                                                                             "<a href='/%s%s'>%s</a>" %
+                                                                                             (os.path.join(path, f.replace(" ", "%20")), "?alt" if alt else "", f))
     output += "</pre><hr>" \
               "</body></html>"
     return output

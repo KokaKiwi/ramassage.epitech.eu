@@ -3,27 +3,14 @@ __author__ = 'steven'
 
 from flask import request, Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc, asc
 import config
 
 import os
-from flask_dance.consumer.backend.sqla import SQLAlchemyBackend
-from flask_dance.contrib.azure import make_azure_blueprint, azure
-from flask_dance.consumer import oauth_authorized, oauth_error
-from werkzeug.contrib.fixers import ProxyFix
-from models import OAuth
-from sqlalchemy.orm.exc import NoResultFound
-from flask_admin import Admin
-from flask_admin import BaseView
-from flask_admin import expose
-from flask_admin import AdminIndexView
-from flask import redirect, render_template, flash
-from flask import url_for
-from flask_admin.contrib.sqla import ModelView as MView
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-
-from datetime import datetime
-
-from models import Project, Task, User, Template, Project_Student
+import csv
+import logging
+import bcrypt
+from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__, template_folder='admin_templates')
 app.config['SQLALCHEMY_DATABASE_URI'] = config.SQL_DB_URI
@@ -31,81 +18,59 @@ app.secret_key = os.urandom(40)
 try:
     if config.DEBUG:
         app.debug = True
-        os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 except ImportError:
     pass
 
 db = SQLAlchemy(app)
-app.config["AZURE_OAUTH_CLIENT_ID"] = config.AZURE_OAUTH_CLIENT_ID
-app.config["AZURE_OAUTH_CLIENT_SECRET"] = config.AZURE_OAUTH_CLIENT_SECRET
 
-azure_bp = make_azure_blueprint(redirect_url="/admin")
-azure_bp.backend = SQLAlchemyBackend(OAuth, db.session, user=current_user)
-app.register_blueprint(azure_bp, url_prefix="/login")
+auth = HTTPBasicAuth()
+
+from flask_admin import Admin
+from flask_admin import BaseView
+from flask_admin import expose
+from flask_admin import AdminIndexView
+from flask import redirect, render_template
+from flask import url_for
+from flask_admin.contrib.sqla import ModelView as MView
+from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual, FilterInList, FilterLike
+from flask_admin.form import rules
+
+from datetime import datetime
+
+from models import Project, Task, User, Template, Project_Student
+
+class Auth(object):
+    @staticmethod
+    def checkHash(encrypted, plain):
+        if bcrypt.hashpw(plain, encrypted) == encrypted:
+            return True
+        return False
+
+    @staticmethod
+    def checkInPasswd(login, password):
+        with open(config.PASSWORD_FILE, 'r') as f:
+            reader = csv.reader(f, delimiter=':', quoting=csv.QUOTE_NONE)
+            for row in reader:
+                if row[0] == login:
+                    return Auth.checkHash(row[1].encode('utf-8'), password.encode('utf-8'))
+        return False
 
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'azure.login'
+@auth.verify_password
+def authenticate(username=None, password=None):
+    logging.info("authenticate: %s" % username)
+    if username not in config.USER_WHITELIST:
+        return None
+    if Auth.checkInPasswd(username, password):
+        return True
+    logging.warning("authenticate: %s, password mismatch" % username)
+    return None
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    session = db.session
-    return session.query(User).get(int(user_id))
-
-@oauth_authorized.connect_via(azure_bp)
-def azure_logged_in(blueprint, token):
-    if not token:
-        flash("Failed to log in with {name}".format(name=blueprint.name))
-        return redirect("/admin/error")
-    # figure out who the user is
-    resp = blueprint.session.get("/v1.0/me")
-
-    if resp.ok:
-        obj = resp.json()
-        username = obj["mail"]
-        if username not in config.USER_WHITELIST:
-            msg = "You are not allowed."
-            flash(msg, category="error")
-            return redirect("/admin/error")
-        session = db.session
-        query = session.query(User).filter_by(login=username)
-        try:
-            user = query.one()
-            if "surname" in obj:
-                user.lastname = obj["surname"] if "surname" in obj else None
-                user.firstname = obj["givenName"] if "givenName" in obj else None
-                session.add(user)
-                session.commit()
-        except NoResultFound:
-            # create a user
-            user = User(login=username)
-            if "surname" in obj:
-                user.lastname = obj["surname"] if "surname" in obj else None
-                user.firstname = obj["givenName"] if "givenName" in obj else None
-            session.add(user)
-            session.commit()
-        login_user(user)
-        flash("Successfully signed in with Office")
-    else:
-        msg = "Failed to fetch user info from {name}".format(name=blueprint.name)
-        flash(msg, category="error")
-    redirect("/admin")
-
-# notify on OAuth provider error
-@oauth_error.connect_via(azure_bp)
-def google_error(blueprint, error, error_description=None, error_uri=None):
-    msg = (
-        "OAuth error from {name}! "
-        "error={error} description={description} uri={uri}"
-    ).format(
-        name=blueprint.name,
-        error=error,
-        description=error_description,
-        uri=error_uri,
-    )
-    flash(msg, category="error")
+def is_authenticated():
+    if auth.username() and auth.username() in config.USER_WHITELIST:
+        return True
+    return False
 
 class ModelView(MView):
     list_template = 'list.html'
@@ -113,22 +78,24 @@ class ModelView(MView):
     edit_template = 'edit.html'
 
     def is_accessible(self):
-        #if not is_authenticated():
-        #    logging.error("is_accessible: Not authenticated")
-        #    return redirect("/")
-        return current_user.is_authenticated
-
+            #if not is_authenticated():
+            #    logging.error("is_accessible: Not authenticated")
+            #    return redirect("/")
+            return is_authenticated()
+    #def is_accessible(self):
+    #    return is_authenticated()
+#
     def _handle_view(self, name, *args, **kwargs):
         if not self.is_accessible():
-            return redirect(url_for("azure.login"))
+            return redirect("/admin_templates/")
 
 
 class AdminIndexView(AdminIndexView):
-    #@login_required
+    @auth.login_required
     @expose('/')
     def index(self):
-        if not azure.authorized or not current_user.is_authenticated:
-            return redirect(url_for("azure.login"))
+        #if not is_authenticated():
+        #    return authenticate()
         return super(AdminIndexView, self).index()
 
 
@@ -149,7 +116,10 @@ class UserModelView(ModelView):
 
 
     def is_accessible(self):
-            return current_user.is_authenticated
+            #if not is_authenticated():
+            #    logging.error("is_accessible: Not authenticated")
+            #    return redirect("/")
+            return is_authenticated()
 
     def __init__(self, session, **kwargs):
         # You can pass name and other parameters if you want to
@@ -163,7 +133,10 @@ class ProjectModelView(ModelView):
     can_edit = False
     can_delete = False
     def is_accessible(self):
-        return current_user.is_authenticated
+            #if not is_authenticated():
+            #    logging.error("is_accessible: Not authenticated")
+            #    return redirect("/")
+            return is_authenticated()
     # Override displayed fields
     column_list = ('token', 'scolaryear', 'deadline', 'module_title', 'module_code',
                    'instance_code', 'location', 'title', 'promo', 'template', 'last_update', 'last_action')
@@ -177,7 +150,10 @@ class ProjectModelView(ModelView):
 class TemplateModelView(ModelView):
     can_delete = False
     def is_accessible(self):
-        return current_user.is_authenticated
+            #if not is_authenticated():
+            #    logging.error("is_accessible: Not authenticated")
+            #    return redirect("/")
+            return is_authenticated()
     # Override displayed fields
     column_list = ('codemodule', 'slug', 'repository_name', 'call_moulitriche', 'call_judge',
                    'school')
@@ -201,7 +177,10 @@ class TemplateModelView(ModelView):
 class TaskModelView(ModelView):
     can_delete = False
     def is_accessible(self):
-        return current_user.is_authenticated
+            #if not is_authenticated():
+            #    logging.error("is_accessible: Not authenticated")
+            #    return redirect("/")
+            return is_authenticated()
     # Override displayed fields
     column_list = ('type', 'launch_date', 'status',
                    'project')
@@ -253,10 +232,9 @@ class Current(BaseView):
         return self.render("projects.html", _id =_id, tpl = obj, current=current, past=past, module_title=mtitle,
                            project_name=pname)
 
+    @auth.login_required
     @expose('/')
     def index(self):
-        if not azure.authorized or not current_user.is_authenticated:
-            return redirect(url_for("azure.login"))
         if "template_id" in request.args:
             return self.template(request.args.get("template_id"))
         if "project_id" in request.args:
@@ -288,10 +266,9 @@ class Current(BaseView):
         return self.render("project_current.html", current_templates = datas)
 
 class Past(Current):
+    @auth.login_required
     @expose('/')
     def index(self):
-        if not azure.authorized or not current_user.is_authenticated:
-            return redirect(url_for("azure.login"))
         if "template_id" in request.args:
             return self.template(request.args.get("template_id"))
         if "project_id" in request.args:
@@ -321,16 +298,7 @@ class Past(Current):
         datas = sorted(datas, key= lambda d: d["min_deadline"], reverse=True)
         return self.render("project_current.html", current_templates = datas)
 
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    flash("You have logged out")
-    return redirect(url_for("index"))
 
-@app.route("/admin/error")
-def error():
-    return render_template('home.html')
 
 admin = Admin(app, name="Ramassage2", index_view=AdminIndexView(), base_template='layout.html', template_mode='bootstrap3')
 
@@ -342,4 +310,4 @@ admin.add_view(TaskModelView(db.session))
 admin.add_view(TemplateModelView(db.session))
 
 if __name__ == "__main__":
-    app.run("0.0.0.0")
+    app.run()
