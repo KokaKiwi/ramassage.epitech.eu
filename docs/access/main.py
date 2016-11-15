@@ -80,6 +80,8 @@ def sizeof_fmt(num, suffix='B'):
 @auth.login_required
 def index(path=""):
     username = mapping.users[auth.username()] if auth.username() in mapping.users else auth.username()
+    if 'alt' in request.args:
+        username = auth.username()
     rpath = "~%s/%s" % (username, path)
     output = "<html><head><title>Index of /%s</title></head>" \
              "<body bgcolor='white'>" \
