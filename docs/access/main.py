@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask_httpauth import HTTPBasicAuth
 import os
 import datetime
