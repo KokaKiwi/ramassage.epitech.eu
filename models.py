@@ -143,7 +143,7 @@ class Project(Base):
     scolaryear = Column(Integer, nullable=False)
     module_title = Column(String(90), nullable=False)
     module_code = Column(String(40), nullable=False)
-    instance_code = Column(String(15), nullable=False)
+    instance_code = Column(String(25), nullable=False)
     location = Column(String(20), nullable=False)
     title = Column(String(50), nullable=False)
     deadline = Column(DateTime, nullable=False)
