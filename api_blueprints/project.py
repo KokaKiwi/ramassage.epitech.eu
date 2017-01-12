@@ -187,6 +187,7 @@ def api_get_project_delivery_last(_id):
         if not p:
             return api_return_error(404, "Project #%s not found" % _id)
         s = SendFile(p.serialize)
+        return send_from_directory(*s.path())
     except FileMissing as e:
         db.session.rollback()
         logging.error(str(e))
@@ -195,7 +196,7 @@ def api_get_project_delivery_last(_id):
         db.session.rollback()
         logging.error(str(e))
         return api_return_error(500, "Server error", str(e))
-    return send_from_directory(*s.path())
+    return api_return_error(400, "Bad request")
 
 #/delivery/last
 #/delivery/official
